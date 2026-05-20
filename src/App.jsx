@@ -57,33 +57,38 @@ function App() {
         </div>
       </aside>
 
-      {/* Menú móvil */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900 text-white px-4 py-3 flex items-center justify-between">
-        <h1 className="text-sm font-bold">Banco de Chile — Análisis legal</h1>
-        <button onClick={() => setMenuAbierto(!menuAbierto)} className="text-gray-300 hover:text-white">
-          {menuAbierto ? '✕' : '☰'}
-        </button>
-      </div>
-      {menuAbierto && (
-        <div className="md:hidden fixed top-12 left-0 right-0 z-40 bg-gray-900 border-t border-gray-700">
-          {secciones.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => { setActiva(s.id); setMenuAbierto(false) }}
-              className={`w-full text-left px-6 py-3 text-sm ${
-                activa === s.id ? 'bg-gray-700 text-white font-medium' : 'text-gray-400'
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Wrapper móvil + contenido */}
+      <div className="flex-1 flex flex-col min-h-screen relative">
 
-      {/* Contenido principal */}
-      <main className="flex-1 overflow-y-auto md:pt-0 pt-14">
-        {Componente ? <Componente /> : <Placeholder id={seccionActual?.label} />}
-      </main>
+        {/* Barra móvil — flujo normal, no fixed */}
+        <div className="md:hidden bg-gray-900 text-white px-4 py-3 flex items-center justify-between shrink-0">
+          <h1 className="text-sm font-bold">Banco de Chile — Análisis legal</h1>
+          <button onClick={() => setMenuAbierto(!menuAbierto)} className="text-gray-300 hover:text-white">
+            {menuAbierto ? '✕' : '☰'}
+          </button>
+        </div>
+        {menuAbierto && (
+          <div className="md:hidden absolute top-[48px] left-0 right-0 z-40 bg-gray-900 border-t border-gray-700">
+            {secciones.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => { setActiva(s.id); setMenuAbierto(false) }}
+                className={`w-full text-left px-6 py-3 text-sm ${
+                  activa === s.id ? 'bg-gray-700 text-white font-medium' : 'text-gray-400'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Contenido principal */}
+        <main className="flex-1 overflow-y-auto">
+          {Componente ? <Componente /> : <Placeholder id={seccionActual?.label} />}
+        </main>
+
+      </div>
     </div>
   )
 }
