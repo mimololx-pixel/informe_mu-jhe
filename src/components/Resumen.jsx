@@ -1,5 +1,80 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
+/* ─── Contador animado ──────────────────────────────────────────── */
+function AnimatedCounter({ target, prefix = '', sufijo = '', duracion = 1200 }) {
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    let frame, start = null
+    const tick = (ts) => {
+      if (!start) start = ts
+      const p = Math.min((ts - start) / duracion, 1)
+      setVal(Math.floor(p * target))
+      if (p < 1) frame = requestAnimationFrame(tick)
+      else setVal(target)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [target, duracion])
+  return <>{prefix}{val}{sufijo}</>
+}
+
+/* ─── Variantes Framer Motion ──────────────────────────────────── */
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.35, ease: 'easeOut' }
+  })
+}
+
+/* ─── Datos del diagrama de ataque ─────────────────────────────── */
+const PASOS = [
+  { id: 1, label: 'Infiltración',   sub: 'Phishing / vulnerabilidad', bg: 'bg-slate-700 border-slate-500' },
+  { id: 2, label: 'Mov. lateral',   sub: 'Acceso a credenciales SWIFT', bg: 'bg-yellow-800 border-yellow-600' },
+  { id: 3, label: 'Activación',     sub: '24 mayo — amanecer', bg: 'bg-orange-800 border-orange-500' },
+]
+const RAMAS = [
+  { label: 'KillMBR',     sub: '~9.000 equipos destruidos', bg: 'bg-red-800 border-red-600',  icono: '⚠' },
+  { label: 'SWIFT Fraud', sub: 'USD 10M transferidos',      bg: 'bg-rose-900 border-rose-700', icono: '⟶$' },
+]
+
+/* ─── Entidades clave ───────────────────────────────────────────── */
+const ENTIDADES = [
+  {
+    logo: '/logos/banco_chile.svg',
+    nombre: 'Banco de Chile',
+    rol: 'Víctima principal',
+    desc: 'Entidad financiera afectada. Responsable de proteger activos y datos de clientes.',
+    badgeColor: 'bg-red-100 text-red-700',
+    accentBorder: 'border-l-4 border-red-400',
+    headerBg: 'bg-red-50',
+    logoBg: 'bg-white',
+  },
+  {
+    logo: '/logos/cmf.png',
+    nombre: 'CMF',
+    rol: 'Organismo regulador',
+    desc: 'Comisión para el Mercado Financiero (ex-SBIF). Investigó y sancionó al banco.',
+    badgeColor: 'bg-green-100 text-green-700',
+    accentBorder: 'border-l-4 border-green-500',
+    headerBg: 'bg-green-50',
+    logoBg: 'bg-white',
+  },
+  {
+    logo: '/logos/swift.svg',
+    nombre: 'SWIFT',
+    rol: 'Red comprometida',
+    desc: 'Sistema global de mensajería financiera. Canal usado para las transferencias fraudulentas.',
+    badgeColor: 'bg-orange-100 text-orange-700',
+    accentBorder: 'border-l-4 border-orange-400',
+    headerBg: 'bg-orange-50',
+    logoBg: 'bg-white',
+  },
+]
+
+/* ─── Íconos de impacto (px absolutos — evita rem scaling) ──────── */
 const ICONOS_IMPACTO = {
   'Financiero': (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"
@@ -33,47 +108,23 @@ const ICONOS_IMPACTO = {
   ),
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.35, ease: 'easeOut' }
-  })
-}
-
-const ENTIDADES = [
-  {
-    logo: '/logos/banco_chile.svg',
-    nombre: 'Banco de Chile',
-    rol: 'Víctima principal',
-    desc: 'Entidad financiera atacada',
-    accent: 'border-blue-200',
-  },
-  {
-    logo: '/logos/cmf.png',
-    nombre: 'CMF',
-    rol: 'Organismo regulador',
-    desc: 'Comisión para el Mercado Financiero (ex-SBIF)',
-    accent: 'border-green-200',
-  },
-  {
-    logo: '/logos/swift.svg',
-    nombre: 'SWIFT',
-    rol: 'Red comprometida',
-    desc: 'Canal de transferencias internacionales utilizado',
-    accent: 'border-orange-200',
-  },
+/* ─── Datos KPIs ────────────────────────────────────────────────── */
+const KPIS = [
+  { target: 10, prefix: 'USD $', sufijo: 'M', label: 'Pérdida total', sub: 'monto transferido fraudulentamente', bg: 'bg-red-900', light: 'text-red-300' },
+  { target: 6,  prefix: 'USD $', sufijo: 'M', label: 'Sin recuperar', sub: 'fondos no restituidos al banco',      bg: 'bg-red-700', light: 'text-red-200' },
+  { target: 9000, prefix: '~', sufijo: '', label: 'Equipos', sub: 'destruidos por KillMBR',                      bg: 'bg-orange-800', light: 'text-orange-200' },
+  { target: 2, prefix: '', sufijo: '', label: 'Vectores',  sub: 'KillMBR y SWIFT simultáneos',                   bg: 'bg-blue-900',   light: 'text-blue-200' },
 ]
 
+/* ═══════════════════════════════════════════════════════════════ */
 export default function Resumen() {
   const timeline = [
-    { date: 'Semanas antes', event: 'Infiltración inicial a la red interna del banco (posiblemente via phishing o vulnerabilidad)' },
-    { date: '24 mayo 2018 — Mañana', event: 'Activación simultánea del malware KillMBR en ~9.000 equipos. Colapso operativo masivo.' },
-    { date: '24 mayo 2018 — Durante crisis', event: 'Ejecución de transferencias SWIFT fraudulentas hacia cuentas en Hong Kong y Madrid.' },
-    { date: '24–25 mayo 2018', event: 'Banco detecta las transferencias. Coordinación con bancos corresponsales para bloquear fondos.' },
-    { date: 'Semanas siguientes', event: 'CMF inicia investigación formal. Empresas de ciberseguridad analizan el malware.' },
-    { date: '2018–2019', event: 'CMF impone multas y exige mejoras en controles de ciberseguridad. Atribución informal al Grupo Lazarus.' },
+    { date: 'Semanas antes',          event: 'Infiltración inicial a la red interna del banco (posiblemente via phishing o vulnerabilidad).' },
+    { date: '24 mayo 2018 — Mañana',  event: 'Activación simultánea del malware KillMBR en ~9.000 equipos. Colapso operativo masivo.' },
+    { date: '24 mayo — Durante crisis',event: 'Ejecución de transferencias SWIFT fraudulentas hacia cuentas en Hong Kong y Madrid.' },
+    { date: '24–25 mayo 2018',         event: 'Banco detecta las transferencias. Coordinación con bancos corresponsales para bloquear fondos.' },
+    { date: 'Semanas siguientes',      event: 'CMF inicia investigación formal. Empresas de ciberseguridad analizan el malware.' },
+    { date: '2018–2019',               event: 'CMF impone multas y exige mejoras en controles de ciberseguridad. Atribución informal al Grupo Lazarus.' },
   ]
 
   const impactos = [
@@ -91,7 +142,7 @@ export default function Resumen() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Banner oscuro de portada */}
+      {/* ── Banner oscuro de portada ── */}
       <div className="relative bg-gradient-to-br from-gray-900 via-blue-950 to-gray-800 rounded-2xl overflow-hidden mb-10 p-8 text-white">
         <div
           className="absolute inset-0 opacity-10"
@@ -110,77 +161,135 @@ export default function Resumen() {
         </div>
       </div>
 
-      {/* Ficha del caso — 3 stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <motion.div
-          custom={0} variants={cardVariants} initial="hidden" animate="visible"
-          whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.18)' }}
-          className="bg-blue-900 text-white rounded-xl p-5 cursor-default"
-        >
-          <p className="text-xs uppercase tracking-widest text-blue-300 mb-1">Fecha del ataque</p>
-          <p className="text-xl font-semibold">24 mayo 2018</p>
-        </motion.div>
-        <motion.div
-          custom={1} variants={cardVariants} initial="hidden" animate="visible"
-          whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.18)' }}
-          className="bg-blue-900 text-white rounded-xl p-5 cursor-default"
-        >
-          <p className="text-xs uppercase tracking-widest text-blue-300 mb-1">Vectores</p>
-          <p className="text-xl font-semibold">KillMBR + SWIFT</p>
-        </motion.div>
-        <motion.div
-          custom={2} variants={cardVariants} initial="hidden" animate="visible"
-          whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.18)' }}
-          className="bg-red-700 text-white rounded-xl p-5 cursor-default"
-        >
-          <p className="text-xs uppercase tracking-widest text-red-200 mb-1">Pérdida estimada</p>
-          <p className="text-xl font-semibold">USD ~6M (neto)</p>
-        </motion.div>
-      </div>
-
-      {/* Entidades clave con logos */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        {ENTIDADES.map((e, i) => (
+      {/* ── KPIs animados ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        {KPIS.map((k, i) => (
           <motion.div
-            key={e.nombre}
-            custom={i + 3}
+            key={k.label}
+            custom={i}
             variants={cardVariants}
             initial="hidden"
             animate="visible"
-            whileHover={{ y: -3, boxShadow: '0 8px 20px rgba(0,0,0,0.10)' }}
-            className={`bg-white border-2 ${e.accent} rounded-xl p-4 flex flex-col items-center text-center cursor-default`}
+            whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.25)' }}
+            className={`${k.bg} text-white rounded-xl p-5 cursor-default`}
           >
-            <div className="h-12 flex items-center justify-center mb-3">
-              <img
-                src={e.logo}
-                alt={e.nombre}
-                style={{ maxHeight: '48px', maxWidth: '140px', objectFit: 'contain' }}
-              />
-            </div>
-            <p className="text-xs uppercase tracking-widest text-gray-400 mb-0.5">{e.rol}</p>
-            <p className="text-sm text-gray-500">{e.desc}</p>
+            <p className={`text-3xl font-bold mb-1 ${k.light}`}>
+              <AnimatedCounter target={k.target} prefix={k.prefix} sufijo={k.sufijo} duracion={1200} />
+            </p>
+            <p className="text-sm font-semibold">{k.label}</p>
+            <p className={`text-xs mt-0.5 ${k.light} opacity-80`}>{k.sub}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* Descripción */}
+      {/* ── Diagrama vector de ataque ── */}
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold text-gray-700 mb-3">Vector de ataque</h2>
+        <div className="bg-gray-900 rounded-2xl p-6 text-white overflow-x-auto">
+
+          {/* Cadena principal (3 pasos) */}
+          <div className="flex items-center gap-2 mb-4 min-w-max">
+            {PASOS.map((paso, i) => (
+              <div key={paso.id} className="flex items-center gap-2">
+                <motion.div
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={`border ${paso.bg} rounded-lg px-4 py-3 min-w-[130px]`}
+                >
+                  <p className="text-xs text-gray-400 mb-0.5">Paso {paso.id}</p>
+                  <p className="font-semibold text-sm">{paso.label}</p>
+                  <p className="text-xs text-gray-300 mt-0.5">{paso.sub}</p>
+                </motion.div>
+                {i < PASOS.length - 1 && (
+                  <span className="text-gray-500 text-xl font-light shrink-0">→</span>
+                )}
+              </div>
+            ))}
+
+            {/* Conector hacia las ramas */}
+            <span className="text-gray-500 text-xl font-light shrink-0">→</span>
+
+            {/* Bifurcación */}
+            <div className="flex flex-col gap-2">
+              {RAMAS.map((rama, i) => (
+                <motion.div
+                  key={rama.label}
+                  custom={i + 3}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={`border ${rama.bg} rounded-lg px-4 py-3 min-w-[160px]`}
+                >
+                  <p className="text-sm font-bold">{rama.label}</p>
+                  <p className="text-xs text-gray-300 mt-0.5">{rama.sub}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-500">
+            El KillMBR actuó como distractor: mientras el personal respondía al colapso operativo,
+            las transferencias SWIFT fraudulentas se ejecutaron sin ser detectadas a tiempo.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Entidades clave con logos ── */}
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">Entidades clave</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {ENTIDADES.map((e, i) => (
+            <motion.div
+              key={e.nombre}
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ y: -3, boxShadow: '0 8px 20px rgba(0,0,0,0.10)' }}
+              className={`bg-white rounded-xl overflow-hidden ${e.accentBorder} shadow-sm cursor-default`}
+            >
+              <div className={`${e.headerBg} px-4 py-4 flex items-center justify-center`} style={{ minHeight: '80px' }}>
+                <div className={`${e.logoBg} rounded-lg shadow-sm px-3 py-2 flex items-center justify-center`} style={{ maxWidth: '160px' }}>
+                  <img
+                    src={e.logo}
+                    alt={e.nombre}
+                    style={{ maxHeight: '44px', maxWidth: '140px', objectFit: 'contain', display: 'block' }}
+                  />
+                </div>
+              </div>
+              <div className="px-4 py-3">
+                <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-2 ${e.badgeColor}`}>
+                  {e.rol}
+                </span>
+                <p className="text-sm text-gray-600">{e.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── ¿Qué ocurrió? ── */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-3">¿Qué ocurrió?</h2>
         <p className="text-gray-600 leading-relaxed">
-          En mayo de 2018, el Banco de Chile sufrió uno de los ciberataques más sofisticados registrados en el sistema
-          financiero latinoamericano. El ataque combinó dos vectores simultáneos: la destrucción masiva de infraestructura
-          interna mediante el malware <strong>KillMBR</strong> (que sobrescribía el Master Boot Record de los equipos
-          dejándolos inoperativos) y la ejecución de <strong>transferencias fraudulentas por la red SWIFT</strong> hacia
-          cuentas en Hong Kong y Madrid, totalizando aproximadamente USD 10 millones.
+          En mayo de 2018, el Banco de Chile sufrió uno de los ciberataques más sofisticados registrados
+          en el sistema financiero latinoamericano. El ataque combinó dos vectores simultáneos: la
+          destrucción masiva de infraestructura interna mediante el malware <strong>KillMBR</strong>
+          (que sobrescribía el Master Boot Record dejando los equipos inoperativos) y la ejecución de{' '}
+          <strong>transferencias fraudulentas por la red SWIFT</strong> hacia cuentas en Hong Kong y Madrid,
+          totalizando aproximadamente USD 10 millones.
         </p>
         <p className="text-gray-600 leading-relaxed mt-3">
-          Las investigaciones de firmas de ciberseguridad apuntaron al <strong>Grupo Lazarus</strong>, vinculado al
-          gobierno de Corea del Norte, aunque nunca se estableció responsabilidad penal formal. Los atacantes explotaron
-          el caos operativo generado por el KillMBR para ejecutar las transferencias sin ser detectados a tiempo.
+          Las investigaciones de firmas de ciberseguridad apuntaron al <strong>Grupo Lazarus</strong>,
+          vinculado al gobierno de Corea del Norte, aunque nunca se estableció responsabilidad penal
+          formal. Los atacantes explotaron el caos operativo generado por el KillMBR para ejecutar las
+          transferencias sin ser detectados a tiempo.
         </p>
       </section>
 
-      {/* Impactos */}
+      {/* ── Impactos ── */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Impacto del incidente</h2>
         <div className="space-y-3">
@@ -201,7 +310,7 @@ export default function Resumen() {
         </div>
       </section>
 
-      {/* Línea de tiempo */}
+      {/* ── Línea de tiempo ── */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Línea de tiempo</h2>
         <div className="relative border-l-2 border-gray-300 pl-6 space-y-6">
@@ -214,7 +323,7 @@ export default function Resumen() {
               animate="visible"
               className="relative"
             >
-              <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-blue-600 border-2 border-white"></div>
+              <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-blue-600 border-2 border-white" />
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{item.date}</p>
               <p className="text-gray-700 mt-1">{item.event}</p>
             </motion.div>
@@ -222,7 +331,7 @@ export default function Resumen() {
         </div>
       </section>
 
-      {/* Actores */}
+      {/* ── Actores ── */}
       <section>
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Actores involucrados</h2>
         <div className="overflow-x-auto">
