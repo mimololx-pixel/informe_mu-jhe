@@ -44,4 +44,16 @@
 
 ---
 
-*Los prompts de las fases 4 a 8 se irán registrando a medida que se ejecute cada fase.*
+### Fase 4 — Comparación de marcos regulatorios
+
+**Prompt utilizado:**
+> "ejecuta la fase 4, y agrega colores a las 4 fases que llevamos y la barra lateral derecha que despliega los modulos hazla mas bonita y dale una buena ubicacion. dame sugerencias y preguntas si lo concideras necesario."
+
+**Sección:** 04_comparacion_muñjhe.md + componente Comparacion.jsx  
+**¿Qué se aceptó?** La estructura completa: banner emerald de sección, tres ejes de comparación (industria, jurisdicción, temporal), tabla por industria con headers coloreados (Banca/Salud/Telecom), 3 cards de jurisdicción en panel oscuro con barras de multa proporcionales, tabla completa jurisdiccional, comparativa 2018 vs 2026 en grid before/after y bloque de síntesis con 4 conclusiones. Además: banner de color a Marco (indigo) y Delitos (rojo), sidebar desktop rediseñado con barra de progreso 4/8 y color por sección, drawer móvil con slide-in animado y backdrop desde el menú hamburguesa.  
+**¿Qué se corrigió?** Ninguna corrección necesaria en esta fase.  
+**Reflexión:** Combinar múltiples solicitudes (fase nueva + mejoras visuales + UI) en un solo prompt requirió planificación explícita en modo /plan antes de ejecutar. Separar el análisis del diseño evitó ambigüedades en la implementación.
+
+---
+
+*Los prompts de las fases 5 a 8 se irán registrando a medida que se ejecute cada fase.*

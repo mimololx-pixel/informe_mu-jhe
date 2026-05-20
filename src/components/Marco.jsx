@@ -141,8 +141,18 @@ export default function Marco() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Marco Normativo</h1>
-      <p className="text-lg text-gray-500 mb-8">Leyes y regulaciones aplicables al caso Banco de Chile (2018)</p>
+      {/* Banner indigo */}
+      <div className="relative bg-gradient-to-br from-indigo-950 via-indigo-900 to-gray-900 rounded-2xl overflow-hidden mb-8 p-7 text-white">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+        />
+        <div className="relative z-10">
+          <p className="text-xs uppercase tracking-widest text-indigo-300 mb-1">Sección 02</p>
+          <h1 className="text-3xl font-bold mb-1">Marco Normativo</h1>
+          <p className="text-indigo-200">Leyes y regulaciones aplicables al caso Banco de Chile (2018)</p>
+        </div>
+      </div>
 
       {/* Nacionales */}
       <section className="mb-10">

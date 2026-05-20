@@ -1,29 +1,126 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Resumen from './components/Resumen'
 import Marco from './components/Marco'
 import Delitos from './components/Delitos'
+import Comparacion from './components/Comparacion'
+
+/* Strings completos — Tailwind 4 no detecta clases dinámicas */
+const COLOR_MAP = {
+  blue:    { border: 'border-blue-400',    bgActive: 'bg-blue-900/40',    dot: 'bg-blue-400'    },
+  indigo:  { border: 'border-indigo-400',  bgActive: 'bg-indigo-900/40',  dot: 'bg-indigo-400'  },
+  red:     { border: 'border-red-400',     bgActive: 'bg-red-900/40',     dot: 'bg-red-400'     },
+  emerald: { border: 'border-emerald-400', bgActive: 'bg-emerald-900/40', dot: 'bg-emerald-400' },
+  amber:   { border: 'border-amber-400',   bgActive: 'bg-amber-900/40',   dot: 'bg-amber-400'   },
+  purple:  { border: 'border-purple-400',  bgActive: 'bg-purple-900/40',  dot: 'bg-purple-400'  },
+  teal:    { border: 'border-teal-400',    bgActive: 'bg-teal-900/40',    dot: 'bg-teal-400'    },
+  gray:    { border: 'border-gray-500',    bgActive: 'bg-gray-800',       dot: 'bg-gray-500'    },
+}
 
 const secciones = [
-  { id: 'resumen',          label: '01 · Resumen ejecutivo', componente: Resumen,  completada: true  },
-  { id: 'marco',            label: '02 · Marco normativo',   componente: Marco,    completada: true  },
-  { id: 'delitos',          label: '03 · Delitos informáticos', componente: Delitos, completada: true },
-  { id: 'comparacion',      label: '04 · Comparación marcos',   componente: null,  completada: false },
-  { id: 'responsabilidades',label: '05 · Responsabilidades',    componente: null,  completada: false },
-  { id: 'datos',            label: '06 · Datos personales',     componente: null,  completada: false },
-  { id: 'conclusiones',     label: '07 · Conclusiones',         componente: null,  completada: false },
-  { id: 'prompts',          label: '08 · Bitácora IA',          componente: null,  completada: false },
+  { id: 'resumen',          label: '01 · Resumen ejecutivo',    componente: Resumen,     completada: true,  color: 'blue'    },
+  { id: 'marco',            label: '02 · Marco normativo',      componente: Marco,       completada: true,  color: 'indigo'  },
+  { id: 'delitos',          label: '03 · Delitos informáticos', componente: Delitos,     completada: true,  color: 'red'     },
+  { id: 'comparacion',      label: '04 · Comparación marcos',   componente: Comparacion, completada: true,  color: 'emerald' },
+  { id: 'responsabilidades',label: '05 · Responsabilidades',    componente: null,        completada: false, color: 'amber'   },
+  { id: 'datos',            label: '06 · Datos personales',     componente: null,        completada: false, color: 'purple'  },
+  { id: 'conclusiones',     label: '07 · Conclusiones',         componente: null,        completada: false, color: 'teal'    },
+  { id: 'prompts',          label: '08 · Bitácora IA',          componente: null,        completada: false, color: 'gray'    },
 ]
 
-function Placeholder({ id }) {
+const completadas = secciones.filter((s) => s.completada).length
+
+function Placeholder({ label }) {
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 text-center">
       <div className="inline-block bg-gray-100 rounded-full px-4 py-1 text-sm text-gray-500 mb-4">En construcción</div>
-      <h2 className="text-2xl font-semibold text-gray-700">Sección "{id}" próximamente</h2>
+      <h2 className="text-2xl font-semibold text-gray-700">Sección "{label}" próximamente</h2>
       <p className="text-gray-500 mt-2">Este componente se agregará en la siguiente fase del proyecto.</p>
     </div>
   )
 }
 
+/* Ícono hamburguesa */
+function IconMenu() {
+  return (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '24px', height: '24px' }}>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  )
+}
+
+/* Ícono X */
+function IconX() {
+  return (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '24px', height: '24px' }}>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  )
+}
+
+/* Lista de items de navegación (reutilizada en desktop y drawer) */
+function NavItems({ activa, setActiva, onSelect }) {
+  return secciones.map((s) => {
+    const cols = COLOR_MAP[s.color]
+    const esActiva = activa === s.id
+    return (
+      <button
+        key={s.id}
+        onClick={() => { setActiva(s.id); onSelect?.() }}
+        className={`w-full text-left px-5 py-3 text-sm transition-all ${
+          esActiva
+            ? `${cols.bgActive} text-white font-medium border-l-4 ${cols.border}`
+            : 'text-gray-400 hover:bg-gray-800/60 hover:text-gray-200 border-l-4 border-transparent'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-2.5">
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.completada ? cols.dot : 'bg-gray-600'}`} />
+            {s.label}
+          </span>
+          {s.completada && (
+            <span className="text-xs text-green-400 opacity-70 shrink-0">✓</span>
+          )}
+        </div>
+      </button>
+    )
+  })
+}
+
+/* Barra de progreso + header de sidebar */
+function SidebarHeader() {
+  const pct = Math.round((completadas / secciones.length) * 100)
+  return (
+    <>
+      <div className="px-6 py-5 border-b border-gray-700">
+        <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">TI3034 · Eval. Sumativa N°2</p>
+        <h1 className="text-base font-bold leading-tight">
+          Banco de Chile<br />
+          <span className="font-normal text-gray-300">Análisis legal 2018</span>
+        </h1>
+      </div>
+      <div className="px-6 py-3 border-b border-gray-700">
+        <div className="flex justify-between text-xs text-gray-400 mb-1.5">
+          <span>Progreso del informe</span>
+          <span className="text-green-400 font-medium">{completadas} / {secciones.length}</span>
+        </div>
+        <div className="w-full bg-gray-700 rounded-full" style={{ height: '4px' }}>
+          <div className="bg-green-400 rounded-full transition-all" style={{ height: '4px', width: `${pct}%` }} />
+        </div>
+      </div>
+    </>
+  )
+}
+
+function SidebarFooter() {
+  return (
+    <div className="px-6 py-4 border-t border-gray-700 text-xs text-gray-500">
+      INACAP Valparaíso · Otoño 2026
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
 function App() {
   const [activa, setActiva] = useState('resumen')
   const [menuAbierto, setMenuAbierto] = useState(false)
@@ -33,67 +130,70 @@ function App() {
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
-      {/* Sidebar desktop */}
+
+      {/* ── Sidebar desktop ── */}
       <aside className="hidden md:flex flex-col w-64 bg-gray-900 text-white shrink-0">
-        <div className="px-6 py-5 border-b border-gray-700">
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">TI3034 · Eval. Sumativa N°2</p>
-          <h1 className="text-base font-bold leading-tight">Banco de Chile<br /><span className="font-normal text-gray-300">Análisis legal 2018</span></h1>
-        </div>
-        <nav className="flex-1 overflow-y-auto py-4">
-          {secciones.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setActiva(s.id)}
-              className={`w-full text-left px-6 py-3 text-sm transition-colors ${
-                activa === s.id
-                  ? 'bg-gray-700 text-white font-medium border-l-4 border-blue-400'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white border-l-4 border-transparent'
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.completada ? 'bg-green-400' : 'bg-gray-600'}`} />
-                {s.label}
-              </span>
-            </button>
-          ))}
+        <SidebarHeader />
+        <nav className="flex-1 overflow-y-auto py-2">
+          <NavItems activa={activa} setActiva={setActiva} />
         </nav>
-        <div className="px-6 py-4 border-t border-gray-700 text-xs text-gray-500">
-          INACAP Valparaíso · Otoño 2026
-        </div>
+        <SidebarFooter />
       </aside>
 
-      {/* Wrapper móvil + contenido */}
-      <div className="flex-1 flex flex-col min-h-screen relative">
+      {/* ── Wrapper móvil + contenido ── */}
+      <div className="flex-1 flex flex-col min-h-screen">
 
-        {/* Barra móvil — flujo normal, no fixed */}
+        {/* Barra top móvil */}
         <div className="md:hidden bg-gray-900 text-white px-4 py-3 flex items-center justify-between shrink-0">
-          <h1 className="text-sm font-bold">Banco de Chile — Análisis legal</h1>
-          <button onClick={() => setMenuAbierto(!menuAbierto)} className="text-gray-300 hover:text-white">
-            {menuAbierto ? '✕' : '☰'}
+          <div>
+            <p className="text-xs text-gray-400 leading-none mb-0.5">TI3034 · Banco de Chile</p>
+            <p className="text-sm font-bold leading-tight">{seccionActual?.label}</p>
+          </div>
+          <button
+            onClick={() => setMenuAbierto(!menuAbierto)}
+            className="text-gray-300 hover:text-white transition-colors p-1"
+            aria-label="Menú"
+          >
+            {menuAbierto ? <IconX /> : <IconMenu />}
           </button>
         </div>
-        {menuAbierto && (
-          <div className="md:hidden absolute top-[48px] left-0 right-0 z-40 bg-gray-900 border-t border-gray-700">
-            {secciones.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => { setActiva(s.id); setMenuAbierto(false) }}
-                className={`w-full text-left px-6 py-3 text-sm ${
-                  activa === s.id ? 'bg-gray-700 text-white font-medium' : 'text-gray-400'
-                }`}
+
+        {/* Drawer móvil — slide desde izquierda con backdrop */}
+        <AnimatePresence>
+          {menuAbierto && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="md:hidden fixed inset-0 bg-black/60 z-30"
+                onClick={() => setMenuAbierto(false)}
+              />
+              {/* Drawer */}
+              <motion.aside
+                key="drawer"
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+                className="md:hidden fixed top-0 left-0 bottom-0 w-72 bg-gray-900 text-white z-40 flex flex-col shadow-2xl"
               >
-                <span className="flex items-center gap-2">
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.completada ? 'bg-green-400' : 'bg-gray-600'}`} />
-                  {s.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
+                <SidebarHeader />
+                <nav className="flex-1 overflow-y-auto py-2">
+                  <NavItems activa={activa} setActiva={setActiva} onSelect={() => setMenuAbierto(false)} />
+                </nav>
+                <SidebarFooter />
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Contenido principal */}
         <main className="flex-1 overflow-y-auto">
-          {Componente ? <Componente /> : <Placeholder id={seccionActual?.label} />}
+          {Componente ? <Componente /> : <Placeholder label={seccionActual?.label} />}
         </main>
 
       </div>

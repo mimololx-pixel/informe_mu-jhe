@@ -197,8 +197,18 @@ export default function Delitos() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Delitos Informáticos</h1>
-      <p className="text-lg text-gray-500 mb-8">Tipificación del caso Banco de Chile bajo la Ley 21.459</p>
+      {/* Banner rojo */}
+      <div className="relative bg-gradient-to-br from-red-950 via-red-900 to-gray-900 rounded-2xl overflow-hidden mb-8 p-7 text-white">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+        />
+        <div className="relative z-10">
+          <p className="text-xs uppercase tracking-widest text-red-300 mb-1">Sección 03</p>
+          <h1 className="text-3xl font-bold mb-1">Delitos Informáticos</h1>
+          <p className="text-red-200">Tipificación bajo la Ley 21.459 — Caso Banco de Chile (2018)</p>
+        </div>
+      </div>
 
       {/* Stats row con contador animado */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
