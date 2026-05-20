@@ -1,3 +1,14 @@
+import { motion } from 'framer-motion'
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.35, ease: 'easeOut' }
+  })
+}
+
 export default function Resumen() {
   const timeline = [
     { date: 'Semanas antes', event: 'Infiltración inicial a la red interna del banco (posiblemente via phishing o vulnerabilidad)' },
@@ -17,24 +28,29 @@ export default function Resumen() {
   ]
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <motion.div
+      className="max-w-4xl mx-auto px-4 py-8"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <h1 className="text-3xl font-bold text-gray-800 mb-2">Resumen Ejecutivo</h1>
       <p className="text-lg text-gray-500 mb-8">Caso Banco de Chile — Ataque SWIFT + KillMBR (Mayo 2018)</p>
 
       {/* Ficha del caso */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        <div className="bg-gray-800 text-white rounded-xl p-5">
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Fecha</p>
+        <motion.div custom={0} variants={cardVariants} initial="hidden" animate="visible" className="bg-blue-900 text-white rounded-xl p-5">
+          <p className="text-xs uppercase tracking-widest text-blue-300 mb-1">Fecha</p>
           <p className="text-xl font-semibold">24 mayo 2018</p>
-        </div>
-        <div className="bg-gray-800 text-white rounded-xl p-5">
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Víctima</p>
+        </motion.div>
+        <motion.div custom={1} variants={cardVariants} initial="hidden" animate="visible" className="bg-blue-900 text-white rounded-xl p-5">
+          <p className="text-xs uppercase tracking-widest text-blue-300 mb-1">Víctima</p>
           <p className="text-xl font-semibold">Banco de Chile</p>
-        </div>
-        <div className="bg-red-700 text-white rounded-xl p-5">
+        </motion.div>
+        <motion.div custom={2} variants={cardVariants} initial="hidden" animate="visible" className="bg-red-700 text-white rounded-xl p-5">
           <p className="text-xs uppercase tracking-widest text-red-200 mb-1">Pérdida estimada</p>
           <p className="text-xl font-semibold">USD ~6M (neto)</p>
-        </div>
+        </motion.div>
       </div>
 
       {/* Descripción */}
@@ -58,10 +74,17 @@ export default function Resumen() {
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Impacto del incidente</h2>
         <div className="space-y-3">
-          {impactos.map((i) => (
-            <div key={i.tipo} className={`border-l-4 rounded-r-lg p-4 ${i.color}`}>
-              <span className="font-semibold">{i.tipo}:</span> {i.desc}
-            </div>
+          {impactos.map((item, i) => (
+            <motion.div
+              key={item.tipo}
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              className={`border-l-4 rounded-r-lg p-4 ${item.color}`}
+            >
+              <span className="font-semibold">{item.tipo}:</span> {item.desc}
+            </motion.div>
           ))}
         </div>
       </section>
@@ -71,11 +94,18 @@ export default function Resumen() {
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Línea de tiempo</h2>
         <div className="relative border-l-2 border-gray-300 pl-6 space-y-6">
           {timeline.map((item, idx) => (
-            <div key={idx} className="relative">
-              <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-gray-800 border-2 border-white"></div>
+            <motion.div
+              key={idx}
+              custom={idx}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              className="relative"
+            >
+              <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-blue-600 border-2 border-white"></div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{item.date}</p>
               <p className="text-gray-700 mt-1">{item.event}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -108,6 +138,6 @@ export default function Resumen() {
           </table>
         </div>
       </section>
-    </div>
+    </motion.div>
   )
 }

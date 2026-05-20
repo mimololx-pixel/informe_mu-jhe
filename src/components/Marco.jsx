@@ -1,3 +1,14 @@
+import { motion } from 'framer-motion'
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.35, ease: 'easeOut' }
+  })
+}
+
 export default function Marco() {
   const nacionales = [
     {
@@ -100,7 +111,12 @@ export default function Marco() {
   ]
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <motion.div
+      className="max-w-4xl mx-auto px-4 py-8"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <h1 className="text-3xl font-bold text-gray-800 mb-2">Marco Normativo</h1>
       <p className="text-lg text-gray-500 mb-8">Leyes y regulaciones aplicables al caso Banco de Chile (2018)</p>
 
@@ -108,10 +124,17 @@ export default function Marco() {
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Normas Nacionales (Chile)</h2>
         <div className="space-y-4">
-          {nacionales.map((n) => (
-            <div key={n.num} className="border border-gray-200 rounded-xl p-5 bg-white">
+          {nacionales.map((n, i) => (
+            <motion.div
+              key={n.num}
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              className="border border-gray-200 rounded-xl p-5 bg-white"
+            >
               <div className="flex items-start gap-3 mb-2">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-gray-800 text-white text-xs font-bold flex items-center justify-center">{n.num}</span>
+                <span className="shrink-0 w-7 h-7 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center">{n.num}</span>
                 <h3 className="font-semibold text-gray-800">{n.nombre}</h3>
               </div>
               <p className="text-sm text-gray-500 mb-1 pl-10"><span className="font-medium text-gray-600">Ámbito:</span> {n.ambito}</p>
@@ -124,7 +147,7 @@ export default function Marco() {
                 </ul>
               )}
               <p className="text-xs text-gray-400 pl-10 mt-2">{n.estado}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -133,15 +156,22 @@ export default function Marco() {
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Normas Internacionales</h2>
         <div className="space-y-4">
-          {internacionales.map((n) => (
-            <div key={n.num} className="border border-gray-200 rounded-xl p-5 bg-white">
+          {internacionales.map((n, i) => (
+            <motion.div
+              key={n.num}
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              className="border border-gray-200 rounded-xl p-5 bg-white"
+            >
               <div className="flex items-start gap-3 mb-2">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-blue-700 text-white text-xs font-bold flex items-center justify-center">{n.num}</span>
+                <span className="shrink-0 w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">{n.num}</span>
                 <h3 className="font-semibold text-gray-800">{n.nombre}</h3>
               </div>
               <p className="text-sm text-gray-500 mb-1 pl-10"><span className="font-medium text-gray-600">Ámbito:</span> {n.ambito}</p>
               <p className="text-sm text-gray-600 pl-10"><span className="font-medium">Relevancia:</span> {n.relevancia}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -170,6 +200,6 @@ export default function Marco() {
           </table>
         </div>
       </section>
-    </div>
+    </motion.div>
   )
 }

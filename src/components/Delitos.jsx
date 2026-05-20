@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const COLOR_MAP = {
   blue:   { badge: 'bg-blue-100 text-blue-800',    barra: 'bg-blue-500',    tag: 'bg-blue-50 text-blue-700'    },
@@ -9,7 +10,7 @@ const COLOR_MAP = {
 }
 
 const STATS = [
-  { valor: '5',       etiqueta: 'Delitos tipificados',   sub: 'Ley 21.459',                        color: 'bg-gray-800 text-white'    },
+  { valor: '5',       etiqueta: 'Delitos tipificados',   sub: 'Ley 21.459',                        color: 'bg-blue-900 text-white'    },
   { valor: '1',       etiqueta: 'Agravante aplicable',   sub: 'Art. 10 — Infraestructura crítica', color: 'bg-yellow-500 text-white'  },
   { valor: '10 años', etiqueta: 'Pena máxima',           sub: 'Arts. 4 y 6 con agravante',         color: 'bg-red-700 text-white'     },
   { valor: 'USD 10M', etiqueta: 'Fraude SWIFT',          sub: '~USD 6M no recuperados',            color: 'bg-orange-600 text-white'  },
@@ -144,6 +145,15 @@ const ESCENARIO = {
   ],
 }
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.35, ease: 'easeOut' }
+  })
+}
+
 export default function Delitos() {
   const [expandido, setExpandido] = useState(null)
   const [filtro, setFiltro] = useState('Todos')
@@ -154,36 +164,52 @@ export default function Delitos() {
     : DELITOS.filter((d) => d.categoria === filtro)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <motion.div
+      className="max-w-4xl mx-auto px-4 py-8"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <h1 className="text-3xl font-bold text-gray-800 mb-2">Delitos Informáticos</h1>
       <p className="text-lg text-gray-500 mb-8">Tipificación del caso Banco de Chile bajo la Ley 21.459</p>
 
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-        {STATS.map((s) => (
-          <div key={s.etiqueta} className={`rounded-xl p-4 ${s.color}`}>
+        {STATS.map((s, i) => (
+          <motion.div
+            key={s.etiqueta}
+            custom={i}
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            className={`rounded-xl p-4 ${s.color}`}
+          >
             <p className="text-2xl font-bold">{s.valor}</p>
             <p className="text-sm font-medium mt-1">{s.etiqueta}</p>
             <p className="text-xs opacity-75 mt-0.5">{s.sub}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Filtro por categoría */}
       <section className="mb-8">
         <div className="flex flex-wrap gap-2">
-          {CATEGORIAS.map((cat) => (
-            <button
+          {CATEGORIAS.map((cat, i) => (
+            <motion.button
               key={cat}
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
               onClick={() => setFiltro(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filtro === cat
-                  ? 'bg-gray-800 text-white'
+                  ? 'bg-blue-700 text-white'
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
               {cat}
-            </button>
+            </motion.button>
           ))}
         </div>
       </section>
@@ -192,95 +218,119 @@ export default function Delitos() {
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Artículos aplicables</h2>
         <div className="space-y-4">
-          {delitosVisibles.map((delito) => {
-            const colores = COLOR_MAP[delito.colorCategoria]
-            const estaExpandido = expandido === delito.id
+          <AnimatePresence>
+            {delitosVisibles.map((delito, i) => {
+              const colores = COLOR_MAP[delito.colorCategoria]
+              const estaExpandido = expandido === delito.id
 
-            return (
-              <div key={delito.id} className="border border-gray-200 rounded-xl bg-white overflow-hidden">
-                {/* Cabecera clickeable */}
-                <button
-                  onClick={() => setExpandido(estaExpandido ? null : delito.id)}
-                  className="w-full text-left p-5 flex items-start gap-3 hover:bg-gray-50 transition-colors"
+              return (
+                <motion.div
+                  key={delito.id}
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit={{ opacity: 0, y: -10, transition: { duration: 0.15 } }}
+                  className="border border-gray-200 rounded-xl bg-white overflow-hidden"
                 >
-                  <span className="shrink-0 w-7 h-7 rounded-full bg-gray-800 text-white text-xs font-bold flex items-center justify-center mt-0.5">
-                    {delito.articulo.replace('Art. ', '')}
-                  </span>
+                  {/* Cabecera clickeable */}
+                  <button
+                    onClick={() => setExpandido(estaExpandido ? null : delito.id)}
+                    className="w-full text-left p-5 flex items-start gap-3 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="shrink-0 w-7 h-7 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center mt-0.5">
+                      {delito.articulo.replace('Art. ', '')}
+                    </span>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-gray-800">
-                        {delito.articulo} — {delito.titulo}
-                      </h3>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colores.badge}`}>
-                        {delito.categoria}
-                      </span>
-                      {delito.agravante && delito.penaConAgravante && (
-                        <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700">
-                          + Agravante
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-gray-800">
+                          {delito.articulo} — {delito.titulo}
+                        </h3>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colores.badge}`}>
+                          {delito.categoria}
                         </span>
-                      )}
-                    </div>
-
-                    <p className="text-sm text-gray-500 mt-1">{delito.accion}</p>
-
-                    {delito.severidad != null && (
-                      <div className="mt-3">
-                        <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-                          <span>Pena máxima</span>
-                          <span className="font-medium text-gray-600">{delito.pena}</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${colores.barra}`}
-                            style={{ width: `${delito.severidad}%` }}
-                          />
-                        </div>
-                        {delito.penaConAgravante && (
-                          <p className="text-xs text-red-600 font-medium mt-1">{delito.penaConAgravante}</p>
+                        {delito.agravante && delito.penaConAgravante && (
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700">
+                            + Agravante
+                          </span>
                         )}
                       </div>
-                    )}
-                  </div>
 
-                  <span className={`shrink-0 text-gray-400 text-xs transition-transform duration-200 ${estaExpandido ? 'rotate-180' : ''}`}>
-                    ▼
-                  </span>
-                </button>
+                      <p className="text-sm text-gray-500 mt-1">{delito.accion}</p>
 
-                {/* Panel expandido */}
-                {estaExpandido && (
-                  <div className="border-t border-gray-100 px-5 pb-5 pt-4 space-y-4">
-                    <div>
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Texto legal (extracto)</p>
-                      <blockquote className="text-sm text-gray-600 italic border-l-4 border-gray-200 pl-3">
-                        "{delito.textoLiteral}"
-                      </blockquote>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Conexión con el ataque</p>
-                      <p className={`text-sm rounded px-3 py-2 ${COLOR_MAP[delito.colorCategoria].tag}`}>
-                        {delito.conexionCaso}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Fundamento jurídico</p>
-                      <p className="text-sm text-gray-600">{delito.fundamentoLegal}</p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <span className="text-sm text-gray-700 bg-gray-100 rounded px-3 py-1">{delito.penaDetalle}</span>
-                      {delito.multa && (
-                        <span className="text-sm text-orange-700 bg-orange-50 rounded px-3 py-1">{delito.multa}</span>
+                      {delito.severidad != null && (
+                        <div className="mt-3">
+                          <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                            <span>Pena máxima</span>
+                            <span className="font-medium text-gray-600">{delito.pena}</span>
+                          </div>
+                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${colores.barra}`}
+                              style={{ width: `${delito.severidad}%` }}
+                            />
+                          </div>
+                          {delito.penaConAgravante && (
+                            <p className="text-xs text-red-600 font-medium mt-1">{delito.penaConAgravante}</p>
+                          )}
+                        </div>
                       )}
                     </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+
+                    <motion.span
+                      animate={{ rotate: estaExpandido ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="shrink-0 text-gray-400 text-xs"
+                    >
+                      ▼
+                    </motion.span>
+                  </button>
+
+                  {/* Panel expandido con animación de altura */}
+                  <AnimatePresence>
+                    {estaExpandido && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <div className="border-t border-gray-100 px-5 pb-5 pt-4 space-y-4">
+                          <div>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Texto legal (extracto)</p>
+                            <blockquote className="text-sm text-gray-600 italic border-l-4 border-gray-200 pl-3">
+                              "{delito.textoLiteral}"
+                            </blockquote>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Conexión con el ataque</p>
+                            <p className={`text-sm rounded px-3 py-2 ${COLOR_MAP[delito.colorCategoria].tag}`}>
+                              {delito.conexionCaso}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Fundamento jurídico</p>
+                            <p className="text-sm text-gray-600">{delito.fundamentoLegal}</p>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            <span className="text-sm text-gray-700 bg-gray-100 rounded px-3 py-1">{delito.penaDetalle}</span>
+                            {delito.multa && (
+                              <span className="text-sm text-orange-700 bg-orange-50 rounded px-3 py-1">{delito.multa}</span>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
 
           {delitosVisibles.length === 0 && (
             <p className="text-center text-gray-400 py-8">No hay delitos en esta categoría.</p>
@@ -331,30 +381,44 @@ export default function Delitos() {
           className="w-full flex items-center justify-between border border-gray-200 rounded-xl p-5 bg-white hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <span className="w-3 h-3 rounded-full bg-gray-800 shrink-0" />
+            <span className="w-3 h-3 rounded-full bg-blue-600 shrink-0" />
             <h2 className="text-lg font-semibold text-gray-800 text-left">{ESCENARIO.titulo}</h2>
           </div>
-          <span className={`shrink-0 text-gray-400 text-xs ml-3 transition-transform duration-200 ${escenarioAbierto ? 'rotate-180' : ''}`}>
+          <motion.span
+            animate={{ rotate: escenarioAbierto ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="shrink-0 text-gray-400 text-xs ml-3"
+          >
             ▼
-          </span>
+          </motion.span>
         </button>
 
-        {escenarioAbierto && (
-          <div className="border border-t-0 border-gray-200 rounded-b-xl bg-white px-5 pb-5 pt-4 space-y-4">
-            {ESCENARIO.puntos.map((punto, idx) => (
-              <div key={idx} className="flex items-start gap-3">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-gray-800 text-white text-xs font-bold flex items-center justify-center mt-0.5">
-                  {idx + 1}
-                </span>
-                <div>
-                  <p className="font-semibold text-gray-800">{punto.heading}</p>
-                  <p className="text-sm text-gray-600 mt-1">{punto.texto}</p>
-                </div>
+        <AnimatePresence>
+          {escenarioAbierto && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              style={{ overflow: 'hidden' }}
+            >
+              <div className="border border-t-0 border-gray-200 rounded-b-xl bg-white px-5 pb-5 pt-4 space-y-4">
+                {ESCENARIO.puntos.map((punto, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <span className="shrink-0 w-7 h-7 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <div>
+                      <p className="font-semibold text-gray-800">{punto.heading}</p>
+                      <p className="text-sm text-gray-600 mt-1">{punto.texto}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
-    </div>
+    </motion.div>
   )
 }
