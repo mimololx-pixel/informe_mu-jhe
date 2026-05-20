@@ -9,6 +9,30 @@ const cardVariants = {
   })
 }
 
+const badgeEstado = (estado) => {
+  if (estado.includes('Derogada'))                          return 'bg-red-100 text-red-700'
+  if (estado.includes('reforma') || estado.includes('implementación')) return 'bg-yellow-100 text-yellow-700'
+  return 'bg-green-100 text-green-700'
+}
+
+const DIMENSIONES = ['Penal', 'Datos', 'Regulatorio', 'Cooperación', 'Técnico']
+
+const COBERTURA = [
+  { norma: 'Ley 19.223',     valores: ['full', 'none', 'none', 'none', 'none'] },
+  { norma: 'Ley 21.459',     valores: ['full', 'none', 'none', 'partial', 'none'] },
+  { norma: 'Ley 19.628',     valores: ['none', 'full', 'none', 'none', 'none'] },
+  { norma: 'DFL N°3 / LGB',  valores: ['none', 'none', 'full', 'none', 'none'] },
+  { norma: 'CMF Circular',   valores: ['none', 'none', 'full', 'none', 'partial'] },
+  { norma: 'Conv. Budapest', valores: ['full', 'partial', 'none', 'full', 'none'] },
+  { norma: 'SWIFT CSP',      valores: ['none', 'none', 'full', 'full', 'full'] },
+  { norma: 'Basilea III',    valores: ['none', 'none', 'full', 'full', 'partial'] },
+  { norma: 'ISO 27001',      valores: ['none', 'partial', 'partial', 'partial', 'full'] },
+  { norma: 'GDPR',           valores: ['none', 'full', 'full', 'partial', 'partial'] },
+]
+
+const COB_COLOR = { full: 'bg-green-500', partial: 'bg-yellow-400', none: 'bg-gray-200' }
+const COB_LABEL = { full: 'Cubre directamente', partial: 'Cubre parcialmente', none: 'No aplica' }
+
 export default function Marco() {
   const nacionales = [
     {
@@ -131,6 +155,7 @@ export default function Marco() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
+              whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.09)' }}
               className="border border-gray-200 rounded-xl p-5 bg-white"
             >
               <div className="flex items-start gap-3 mb-2">
@@ -140,13 +165,15 @@ export default function Marco() {
               <p className="text-sm text-gray-500 mb-1 pl-10"><span className="font-medium text-gray-600">Ámbito:</span> {n.ambito}</p>
               <p className="text-sm text-gray-600 mb-2 pl-10"><span className="font-medium">Relevancia:</span> {n.relevancia}</p>
               {n.articulos.length > 0 && (
-                <ul className="pl-10 space-y-1">
+                <ul className="pl-10 space-y-1 mb-2">
                   {n.articulos.map((a) => (
                     <li key={a} className="text-sm text-blue-700 bg-blue-50 rounded px-3 py-1">{a}</li>
                   ))}
                 </ul>
               )}
-              <p className="text-xs text-gray-400 pl-10 mt-2">{n.estado}</p>
+              <span className={`ml-10 inline-block text-xs px-2 py-0.5 rounded-full font-medium ${badgeEstado(n.estado)}`}>
+                {n.estado}
+              </span>
             </motion.div>
           ))}
         </div>
@@ -163,6 +190,7 @@ export default function Marco() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
+              whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.09)' }}
               className="border border-gray-200 rounded-xl p-5 bg-white"
             >
               <div className="flex items-start gap-3 mb-2">
@@ -177,7 +205,7 @@ export default function Marco() {
       </section>
 
       {/* Tabla resumen */}
-      <section>
+      <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Resumen de normas aplicables</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
@@ -198,6 +226,50 @@ export default function Marco() {
               ))}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* Mapa de cobertura normativa */}
+      <section>
+        <h2 className="text-xl font-semibold text-gray-700 mb-1">Mapa de cobertura normativa</h2>
+        <p className="text-sm text-gray-500 mb-4">¿Qué dimensión del incidente aborda cada norma?</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="text-left p-3 rounded-tl-lg">Norma</th>
+                {DIMENSIONES.map((d) => (
+                  <th key={d} className="p-3 text-center text-xs">{d}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {COBERTURA.map((row) => (
+                <tr key={row.norma} className="hover:bg-gray-50">
+                  <td className="p-3 font-medium text-gray-700 whitespace-nowrap">{row.norma}</td>
+                  {row.valores.map((v, i) => (
+                    <td key={i} className="p-3 text-center">
+                      <span
+                        className={`inline-block w-4 h-4 rounded-full ${COB_COLOR[v]}`}
+                        title={COB_LABEL[v]}
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex flex-wrap gap-4 mt-3 text-xs text-gray-500">
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Cubre directamente
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" /> Cubre parcialmente
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-gray-200 border border-gray-300 inline-block" /> No aplica
+          </span>
         </div>
       </section>
     </motion.div>

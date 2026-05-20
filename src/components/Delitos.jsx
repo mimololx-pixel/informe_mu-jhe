@@ -1,5 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+
+function AnimatedCounter({ target, sufijo = '', duracion = 1000 }) {
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    let frame
+    let start = null
+    const tick = (timestamp) => {
+      if (!start) start = timestamp
+      const progress = Math.min((timestamp - start) / duracion, 1)
+      setVal(Math.floor(progress * target))
+      if (progress < 1) frame = requestAnimationFrame(tick)
+      else setVal(target)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [target, duracion])
+  return <>{val}{sufijo}</>
+}
 
 const COLOR_MAP = {
   blue:   { badge: 'bg-blue-100 text-blue-800',    barra: 'bg-blue-500',    tag: 'bg-blue-50 text-blue-700'    },
@@ -10,10 +28,10 @@ const COLOR_MAP = {
 }
 
 const STATS = [
-  { valor: '5',       etiqueta: 'Delitos tipificados',   sub: 'Ley 21.459',                        color: 'bg-blue-900 text-white'    },
-  { valor: '1',       etiqueta: 'Agravante aplicable',   sub: 'Art. 10 — Infraestructura crítica', color: 'bg-yellow-500 text-white'  },
-  { valor: '10 años', etiqueta: 'Pena máxima',           sub: 'Arts. 4 y 6 con agravante',         color: 'bg-red-700 text-white'     },
-  { valor: 'USD 10M', etiqueta: 'Fraude SWIFT',          sub: '~USD 6M no recuperados',            color: 'bg-orange-600 text-white'  },
+  { valor: '5',       numerico: 5,  sufijo: '',      etiqueta: 'Delitos tipificados',   sub: 'Ley 21.459',                        color: 'bg-blue-900 text-white'   },
+  { valor: '1',       numerico: 1,  sufijo: '',      etiqueta: 'Agravante aplicable',   sub: 'Art. 10 — Infraestructura crítica', color: 'bg-yellow-500 text-white' },
+  { valor: '10 años', numerico: 10, sufijo: ' años', etiqueta: 'Pena máxima',           sub: 'Arts. 4 y 6 con agravante',         color: 'bg-red-700 text-white'    },
+  { valor: 'USD 10M', numerico: null,               etiqueta: 'Fraude SWIFT',           sub: '~USD 6M no recuperados',            color: 'bg-orange-600 text-white' },
 ]
 
 const CATEGORIAS = ['Todos', 'Acceso', 'Integridad', 'Fraude', 'Dispositivos', 'Agravante']
@@ -145,6 +163,15 @@ const ESCENARIO = {
   ],
 }
 
+const GRAFICO_PENAS = [
+  { id: 'art2', label: 'Art. 2', titulo: 'Acceso ilícito',        anos: 3, anosAg: null, color: 'bg-blue-500' },
+  { id: 'art3', label: 'Art. 3', titulo: 'Interceptación',        anos: 3, anosAg: null, color: 'bg-blue-500' },
+  { id: 'art4', label: 'Art. 4', titulo: 'Integridad del sistema', anos: 5, anosAg: 10,   color: 'bg-red-500' },
+  { id: 'art6', label: 'Art. 6', titulo: 'Fraude informático',     anos: 5, anosAg: 10,   color: 'bg-orange-500' },
+  { id: 'art8', label: 'Art. 8', titulo: 'Abuso de dispositivos',  anos: 3, anosAg: null, color: 'bg-purple-500' },
+]
+const MAX_ANOS = 10
+
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i) => ({
@@ -173,7 +200,7 @@ export default function Delitos() {
       <h1 className="text-3xl font-bold text-gray-800 mb-2">Delitos Informáticos</h1>
       <p className="text-lg text-gray-500 mb-8">Tipificación del caso Banco de Chile bajo la Ley 21.459</p>
 
-      {/* Stats row */}
+      {/* Stats row con contador animado */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
         {STATS.map((s, i) => (
           <motion.div
@@ -182,9 +209,15 @@ export default function Delitos() {
             variants={cardVariants}
             initial="hidden"
             animate="visible"
-            className={`rounded-xl p-4 ${s.color}`}
+            whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
+            className={`rounded-xl p-4 cursor-default ${s.color}`}
           >
-            <p className="text-2xl font-bold">{s.valor}</p>
+            <p className="text-2xl font-bold">
+              {s.numerico !== null
+                ? <AnimatedCounter target={s.numerico} sufijo={s.sufijo} />
+                : s.valor
+              }
+            </p>
             <p className="text-sm font-medium mt-1">{s.etiqueta}</p>
             <p className="text-xs opacity-75 mt-0.5">{s.sub}</p>
           </motion.div>
@@ -266,9 +299,11 @@ export default function Delitos() {
                             <span className="font-medium text-gray-600">{delito.pena}</span>
                           </div>
                           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div
+                            <motion.div
                               className={`h-full rounded-full ${colores.barra}`}
-                              style={{ width: `${delito.severidad}%` }}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${delito.severidad}%` }}
+                              transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
                             />
                           </div>
                           {delito.penaConAgravante && (
@@ -335,6 +370,48 @@ export default function Delitos() {
           {delitosVisibles.length === 0 && (
             <p className="text-center text-gray-400 py-8">No hay delitos en esta categoría.</p>
           )}
+        </div>
+      </section>
+
+      {/* Comparativa visual de penas */}
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">Comparativa visual de penas</h2>
+        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
+          {GRAFICO_PENAS.map((item, i) => (
+            <div key={item.id} className="flex items-center gap-3">
+              <div className="w-24 shrink-0">
+                <p className="text-xs font-semibold text-gray-700">{item.label}</p>
+                <p className="text-xs text-gray-400 truncate">{item.titulo}</p>
+              </div>
+              <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden flex">
+                <motion.div
+                  className={`h-full ${item.color}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(item.anos / MAX_ANOS) * 100}%` }}
+                  transition={{ duration: 0.6, delay: i * 0.1, ease: 'easeOut' }}
+                />
+                {item.anosAg && (
+                  <motion.div
+                    className="h-full bg-red-200"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((item.anosAg - item.anos) / MAX_ANOS) * 100}%` }}
+                    transition={{ duration: 0.5, delay: i * 0.1 + 0.5, ease: 'easeOut' }}
+                  />
+                )}
+              </div>
+              <div className="w-28 shrink-0 text-right">
+                <p className="text-xs text-gray-600">hasta {item.anos} años</p>
+                {item.anosAg && <p className="text-xs text-red-500 font-medium">+ Art.10: {item.anosAg} años</p>}
+              </div>
+            </div>
+          ))}
+          <div className="flex flex-wrap gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block" /> Acceso / Abuso</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> Integridad</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-orange-500 inline-block" /> Fraude</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500 inline-block" /> Dispositivos</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-200 border border-red-300 inline-block" /> Extensión Art. 10</span>
+          </div>
         </div>
       </section>
 

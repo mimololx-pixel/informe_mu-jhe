@@ -4,14 +4,14 @@ import Marco from './components/Marco'
 import Delitos from './components/Delitos'
 
 const secciones = [
-  { id: 'resumen', label: '01 · Resumen ejecutivo', componente: Resumen },
-  { id: 'marco', label: '02 · Marco normativo', componente: Marco },
-  { id: 'delitos', label: '03 · Delitos informáticos', componente: Delitos },
-  { id: 'comparacion', label: '04 · Comparación marcos', componente: null },
-  { id: 'responsabilidades', label: '05 · Responsabilidades', componente: null },
-  { id: 'datos', label: '06 · Datos personales', componente: null },
-  { id: 'conclusiones', label: '07 · Conclusiones', componente: null },
-  { id: 'prompts', label: '08 · Bitácora IA', componente: null },
+  { id: 'resumen',          label: '01 · Resumen ejecutivo', componente: Resumen,  completada: true  },
+  { id: 'marco',            label: '02 · Marco normativo',   componente: Marco,    completada: true  },
+  { id: 'delitos',          label: '03 · Delitos informáticos', componente: Delitos, completada: true },
+  { id: 'comparacion',      label: '04 · Comparación marcos',   componente: null,  completada: false },
+  { id: 'responsabilidades',label: '05 · Responsabilidades',    componente: null,  completada: false },
+  { id: 'datos',            label: '06 · Datos personales',     componente: null,  completada: false },
+  { id: 'conclusiones',     label: '07 · Conclusiones',         componente: null,  completada: false },
+  { id: 'prompts',          label: '08 · Bitácora IA',          componente: null,  completada: false },
 ]
 
 function Placeholder({ id }) {
@@ -50,7 +50,10 @@ function App() {
                   : 'text-gray-400 hover:bg-gray-800 hover:text-white border-l-4 border-transparent'
               }`}
             >
-              {s.label}
+              <span className="flex items-center gap-2">
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.completada ? 'bg-green-400' : 'bg-gray-600'}`} />
+                {s.label}
+              </span>
             </button>
           ))}
         </nav>
@@ -79,7 +82,10 @@ function App() {
                   activa === s.id ? 'bg-gray-700 text-white font-medium' : 'text-gray-400'
                 }`}
               >
-                {s.label}
+                <span className="flex items-center gap-2">
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.completada ? 'bg-green-400' : 'bg-gray-600'}`} />
+                  {s.label}
+                </span>
               </button>
             ))}
           </div>
