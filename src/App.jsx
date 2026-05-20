@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import Resumen from './components/Resumen'
+import Marco from './components/Marco'
 
 const secciones = [
   { id: 'resumen', label: '01 · Resumen ejecutivo', componente: Resumen },
-  { id: 'marco', label: '02 · Marco normativo', componente: null },
+  { id: 'marco', label: '02 · Marco normativo', componente: Marco },
   { id: 'delitos', label: '03 · Delitos informáticos', componente: null },
   { id: 'comparacion', label: '04 · Comparación marcos', componente: null },
   { id: 'responsabilidades', label: '05 · Responsabilidades', componente: null },
