@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70">
+  <rect width="240" height="70" rx="6" fill="#003087"/>
+  <text x="120" y="28" font-family="Arial,sans-serif" font-size="11" fill="#90b8e8" text-anchor="middle" letter-spacing="2">BANCO DE CHILE</text>
+  <line x1="20" y1="36" x2="220" y2="36" stroke="#1a5fad" stroke-width="1"/>
+  <text x="120" y="54" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Banco de Chile</text>
+</svg>
