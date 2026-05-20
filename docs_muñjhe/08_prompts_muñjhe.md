@@ -32,4 +32,16 @@
 
 ---
 
-*Los prompts de las fases 3 a 8 se irán registrando a medida que se ejecute cada fase.*
+### Fase 3 — Tipificación de delitos informáticos
+
+**Prompt utilizado:**
+> "Ejecutemos la fase 3, pero intentemos mejorar con algunas interacciones bonitas en la página de Vercel para que sea bien interactivo."
+
+**Sección:** 03_delitos_muñjhe.md + componente Delitos.jsx  
+**¿Qué se aceptó?** La estructura completa: stats row con 4 métricas clave, filtros de categoría por pills, cards expandibles con acordeón (texto legal, conexión con el ataque, fundamento jurídico, barra de severidad visual), tabla resumen y panel colapsable de escenario hipotético en tribunales chilenos.  
+**¿Qué se corrigió?** Ninguna corrección necesaria en esta fase.  
+**Reflexión:** Pedir interactividad explícita (acordeón, filtros, barra de pena) antes de la implementación produjo un componente con 3 estados `useState` bien definidos desde el diseño, sin deuda técnica posterior.
+
+---
+
+*Los prompts de las fases 4 a 8 se irán registrando a medida que se ejecute cada fase.*
