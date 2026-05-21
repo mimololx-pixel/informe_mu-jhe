@@ -68,4 +68,16 @@
 
 ---
 
-*Los prompts de las fases 6 a 8 se irán registrando a medida que se ejecute cada fase.*
+### Fase 6 — Datos personales y Ley 19.628
+
+**Prompt utilizado:**
+> "lee el .md y ejecuta la fase que corresponda"
+
+**Sección:** 06_datos_muñjhe.md + componente Datos.jsx  
+**¿Qué se aceptó?** La estructura completa: banner purple con dot-grid (Criterio 2.1.5), stats row con 4 KPIs animados (5 categorías / 4 derechos ARCO / 4 obligaciones / 6 años hasta reforma), tabla de sistemas comprometidos + tabla de categorías de datos (columnas), cards expandibles de obligaciones legales con cita legal y badge de estado (Incumplida/Vulnerada/Vacío legal), cards ARCO expandibles (A/R/C/O) con relevancia al caso, panel de secreto bancario + tabla comparativa Ley 19.628 vs GDPR, y grid de la Reforma Ley 21.719 con bloque de conclusión.  
+**¿Qué se corrigió?** Ninguna corrección necesaria en esta fase.  
+**Reflexión:** Delegar la lectura del .md directamente al asistente ("lee el .md y ejecuta la fase que corresponda") funcionó de forma óptima porque el contexto de memoria ya contenía la ruta del archivo y el patrón visual establecido. Un prompt mínimo produjo un componente completo gracias a la memoria acumulada de las fases anteriores.
+
+---
+
+*Los prompts de las fases 7 y 8 se irán registrando a medida que se ejecute cada fase.*
