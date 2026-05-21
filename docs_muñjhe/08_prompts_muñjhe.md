@@ -56,4 +56,16 @@
 
 ---
 
-*Los prompts de las fases 5 a 8 se irán registrando a medida que se ejecute cada fase.*
+### Fase 5 — Responsabilidades legales de los actores
+
+**Prompt utilizado:**
+> "ejecutemos la fase 5, pero necesito que la mejores visualmente si es necesario utiliza de ejemplo alguna pagina de confianza de la web. Hazme sugerencias o preguntas si es optimo."
+
+**Sección:** 05_responsabilidades_muñjhe.md + componente Responsabilidades.jsx  
+**¿Qué se aceptó?** La estructura completa: banner amber de sección, stats row con 4 KPIs animados (5 actores, 6 delitos, USD 10M+ daños, 0 condenas firmes), matriz de responsabilidades tipo heatmap legal (3 tipos × 5 actores) con tooltips hover que muestran la norma aplicable, cards expandibles por actor con tablas de detalle penal/civil/administrativa y panel de obstáculos prácticos para los atacantes, tabla resumen final con badges coloreados y panel colapsable con nota sobre Ley 20.393.  
+**¿Qué se corrigió?** Ninguna corrección necesaria en esta fase.  
+**Reflexión:** La combinación de matriz heatmap + acordeón elegida mediante pregunta previa al usuario permitió obtener un componente con dos niveles de lectura: vista rápida (matriz) y análisis detallado (acordeón). Preguntar el layout antes de implementar evitó iterar sobre el diseño.
+
+---
+
+*Los prompts de las fases 6 a 8 se irán registrando a medida que se ejecute cada fase.*

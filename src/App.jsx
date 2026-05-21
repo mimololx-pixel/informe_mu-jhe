@@ -4,6 +4,7 @@ import Resumen from './components/Resumen'
 import Marco from './components/Marco'
 import Delitos from './components/Delitos'
 import Comparacion from './components/Comparacion'
+import Responsabilidades from './components/Responsabilidades'
 
 /* Strings completos — Tailwind 4 no detecta clases dinámicas */
 const COLOR_MAP = {
@@ -22,7 +23,7 @@ const secciones = [
   { id: 'marco',            label: '02 · Marco normativo',      componente: Marco,       completada: true,  color: 'indigo'  },
   { id: 'delitos',          label: '03 · Delitos informáticos', componente: Delitos,     completada: true,  color: 'red'     },
   { id: 'comparacion',      label: '04 · Comparación marcos',   componente: Comparacion, completada: true,  color: 'emerald' },
-  { id: 'responsabilidades',label: '05 · Responsabilidades',    componente: null,        completada: false, color: 'amber'   },
+  { id: 'responsabilidades',label: '05 · Responsabilidades',    componente: Responsabilidades, completada: true,  color: 'amber'   },
   { id: 'datos',            label: '06 · Datos personales',     componente: null,        completada: false, color: 'purple'  },
   { id: 'conclusiones',     label: '07 · Conclusiones',         componente: null,        completada: false, color: 'teal'    },
   { id: 'prompts',          label: '08 · Bitácora IA',          componente: null,        completada: false, color: 'gray'    },
