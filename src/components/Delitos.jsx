@@ -185,10 +185,23 @@ export default function Delitos() {
   const [expandido, setExpandido] = useState(null)
   const [filtro, setFiltro] = useState('Todos')
   const [escenarioAbierto, setEscenarioAbierto] = useState(false)
+  const [busqueda, setBusqueda] = useState('')
 
-  const delitosVisibles = filtro === 'Todos'
-    ? DELITOS
-    : DELITOS.filter((d) => d.categoria === filtro)
+  const conteoCategoria = (cat) =>
+    cat === 'Todos' ? DELITOS.length : DELITOS.filter((d) => d.categoria === cat).length
+
+  const delitosVisibles = DELITOS
+    .filter((d) => filtro === 'Todos' || d.categoria === filtro)
+    .filter((d) => {
+      if (!busqueda) return true
+      const q = busqueda.toLowerCase()
+      return (
+        d.titulo.toLowerCase().includes(q) ||
+        d.articulo.toLowerCase().includes(q) ||
+        d.accion.toLowerCase().includes(q) ||
+        d.categoria.toLowerCase().includes(q)
+      )
+    })
 
   return (
     <motion.div
@@ -234,32 +247,67 @@ export default function Delitos() {
         ))}
       </div>
 
-      {/* Filtro por categoría */}
-      <section className="mb-8">
+      {/* Filtro por categoría + búsqueda */}
+      <section className="mb-8 space-y-3">
         <div className="flex flex-wrap gap-2">
-          {CATEGORIAS.map((cat, i) => (
-            <motion.button
-              key={cat}
-              custom={i}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              onClick={() => setFiltro(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filtro === cat
-                  ? 'bg-blue-700 text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
+          {CATEGORIAS.map((cat, i) => {
+            const count = conteoCategoria(cat)
+            return (
+              <motion.button
+                key={cat}
+                custom={i}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                onClick={() => { setFiltro(cat); setExpandido(null) }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  filtro === cat
+                    ? 'bg-blue-700 text-white'
+                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {cat}
+                <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${
+                  filtro === cat ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'
+                }`}>
+                  {count}
+                </span>
+              </motion.button>
+            )
+          })}
+        </div>
+
+        {/* Campo de búsqueda */}
+        <div className="relative max-w-sm">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" style={{ fontSize: '14px' }}>
+            🔍
+          </span>
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => { setBusqueda(e.target.value); setExpandido(null) }}
+            placeholder="Buscar por artículo, título o acción…"
+            className="w-full pl-8 pr-8 py-2 text-sm border border-gray-200 rounded-full bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-300 transition"
+          />
+          {busqueda && (
+            <button
+              onClick={() => setBusqueda('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
             >
-              {cat}
-            </motion.button>
-          ))}
+              ✕
+            </button>
+          )}
         </div>
       </section>
 
       {/* Cards de delitos (acordeón) */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Artículos aplicables</h2>
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          Artículos aplicables
+          {busqueda && (
+            <span className="ml-2 text-sm font-normal text-gray-400">— {delitosVisibles.length} resultado{delitosVisibles.length !== 1 ? 's' : ''} para "{busqueda}"</span>
+          )}
+        </h2>
         <div className="space-y-4">
           <AnimatePresence>
             {delitosVisibles.map((delito, i) => {
@@ -378,7 +426,14 @@ export default function Delitos() {
           </AnimatePresence>
 
           {delitosVisibles.length === 0 && (
-            <p className="text-center text-gray-400 py-8">No hay delitos en esta categoría.</p>
+            <div className="text-center py-10">
+              <p className="text-gray-400 text-sm">
+                {busqueda
+                  ? <>Sin resultados para <strong>"{busqueda}"</strong>. <button onClick={() => setBusqueda('')} className="text-blue-500 hover:underline">Limpiar búsqueda</button></>
+                  : 'No hay delitos en esta categoría.'
+                }
+              </p>
+            </div>
           )}
         </div>
       </section>
