@@ -56,6 +56,11 @@ const OBLIGACIONES = [
     cita: '"El responsable de los datos personales deberá cuidar de ellos con la debida diligencia, haciéndose responsable de los daños."',
     situacion: 'El ataque evidenció deficiencias críticas de seguridad en los sistemas del banco.',
     estado: 'Incumplida',
+    reforma: {
+      norma: 'Art. 14 Ley 21.719',
+      texto: 'Medidas de seguridad proporcionales al riesgo. Se incorpora la obligación de realizar análisis de impacto en protección de datos (DPIA) para tratamientos de alto riesgo, similar al Art. 35 GDPR.',
+      badge: 'Reforzada',
+    },
   },
   {
     nombre: 'Uso solo para la finalidad declarada',
@@ -63,6 +68,11 @@ const OBLIGACIONES = [
     cita: 'Los datos deben usarse solo para el fin que motivó su recopilación.',
     situacion: 'Los atacantes usaron los datos para fines no consentidos (fraude y robo). El banco debe garantizar que terceros no accedan.',
     estado: 'Vulnerada',
+    reforma: {
+      norma: 'Art. 3 (principios) Ley 21.719',
+      texto: 'Se introduce explícitamente el principio de minimización de datos: solo se recogerán datos estrictamente necesarios para la finalidad declarada. Multa por incumplimiento proporcional a los ingresos.',
+      badge: 'Reforzada',
+    },
   },
   {
     nombre: 'Confidencialidad',
@@ -70,6 +80,11 @@ const OBLIGACIONES = [
     cita: 'El responsable y quienes intervengan en el tratamiento deben guardar secreto de los datos.',
     situacion: 'El deber de confidencialidad fue vulnerado de facto por el acceso no autorizado a los sistemas.',
     estado: 'Vulnerada',
+    reforma: {
+      norma: 'Art. 14 (seguridad) Ley 21.719',
+      texto: 'Se mantiene el deber de confidencialidad con sanciones significativamente más severas y posibilidad de multa proporcional a los ingresos anuales del responsable del tratamiento.',
+      badge: 'Reforzada',
+    },
   },
   {
     nombre: 'Notificación a los titulares',
@@ -77,6 +92,11 @@ const OBLIGACIONES = [
     cita: 'La Ley 19.628 vigente en 2018 no exigía notificación obligatoria de brechas a los titulares.',
     situacion: 'Hoy la normativa CMF sí lo exige para entidades financieras. La Ley 21.719 lo extiende a todos los responsables.',
     estado: 'Vacío legal',
+    reforma: {
+      norma: 'Art. 15 Ley 21.719',
+      texto: 'Notificación obligatoria al Consejo para la Transparencia y a los titulares afectados dentro de 72 horas desde el conocimiento de la brecha. Elimina completamente el vacío legal de 2018.',
+      badge: 'Corregida',
+    },
   },
 ]
 
@@ -84,6 +104,12 @@ const ESTADO_STYLE = {
   'Incumplida':  'bg-red-100 text-red-800 border border-red-300',
   'Vulnerada':   'bg-orange-100 text-orange-800 border border-orange-300',
   'Vacío legal': 'bg-gray-100 text-gray-600 border border-gray-300',
+}
+
+const REFORMA_BADGE_STYLE = {
+  'Corregida':  'bg-green-100 text-green-800 border border-green-300',
+  'Reforzada':  'bg-blue-100 text-blue-800 border border-blue-300',
+  'Sin cambio': 'bg-gray-100 text-gray-600 border border-gray-200',
 }
 
 const ARCO = [
@@ -126,11 +152,36 @@ const ARCO = [
 ]
 
 const GDPR_ROWS = [
-  { aspecto: 'Notificación de brecha', chile: 'No obligatoria (2018)', gdpr: 'Obligatoria en 72 h — Arts. 33-34', favorGDPR: true },
-  { aspecto: 'Multas por incumplimiento', chile: 'Históricamente bajas / inexistentes', gdpr: 'Hasta 4% facturación anual global', favorGDPR: true },
-  { aspecto: 'Principio de minimización de datos', chile: 'No explícito en 2018', gdpr: 'Sí — Art. 5 GDPR', favorGDPR: true },
-  { aspecto: 'Derecho al olvido', chile: 'No contemplado en 2018', gdpr: 'Sí — Art. 17 GDPR', favorGDPR: true },
-  { aspecto: 'Análisis de impacto (DPIA)', chile: 'No exigido en 2018', gdpr: 'Obligatorio para tratamientos de alto riesgo — Art. 35', favorGDPR: true },
+  {
+    aspecto: 'Notificación de brecha',
+    chile: 'No obligatoria (2018)',
+    gdpr: 'Obligatoria en 72 h — Arts. 33-34',
+    detalle: 'Si el GDPR hubiera aplicado en 2018, el Banco de Chile habría tenido 72 horas para notificar a la autoridad supervisora y, si el riesgo era alto, también a los titulares afectados. En la práctica, la brecha fue comunicada semanas después y solo a través de declaraciones públicas, sin cumplir un protocolo formal de notificación.',
+  },
+  {
+    aspecto: 'Multas por incumplimiento',
+    chile: 'Históricamente bajas / inexistentes',
+    gdpr: 'Hasta 4% facturación anual global',
+    detalle: 'Con ingresos de Banco de Chile sobre USD 1.000 millones anuales, una multa del 4% bajo GDPR podría alcanzar USD 40 millones — cuatro veces el monto robado. En contraste, en 2018 la CMF solo podía imponer multas de hasta UF 5.000 (~USD 185.000), lo que no representaba un incentivo económico suficiente para invertir en seguridad.',
+  },
+  {
+    aspecto: 'Principio de minimización de datos',
+    chile: 'No explícito en 2018',
+    gdpr: 'Sí — Art. 5 GDPR',
+    detalle: 'La minimización habría exigido que el banco solo retuviera datos estrictamente necesarios para cada operación. Bajo ese estándar, datos de empleados innecesarios en el Active Directory — que facilitaron el movimiento lateral de los atacantes — no habrían debido estar disponibles en esos sistemas.',
+  },
+  {
+    aspecto: 'Derecho al olvido',
+    chile: 'No contemplado en 2018',
+    gdpr: 'Sí — Art. 17 GDPR',
+    detalle: 'Aunque no directamente relevante para el ataque, el derecho al olvido habría permitido a los clientes solicitar la eliminación de datos comprometidos del ataque que fueron capturados por terceros. En el contexto del fraude SWIFT, esto habría afectado los datos de las transferencias que llegaron a cuentas en Hong Kong y Madrid.',
+  },
+  {
+    aspecto: 'Análisis de impacto (DPIA)',
+    chile: 'No exigido en 2018',
+    gdpr: 'Obligatorio para tratamientos de alto riesgo — Art. 35',
+    detalle: 'Un DPIA previo habría identificado el sistema SWIFT como un tratamiento de alto riesgo por la naturaleza de los datos (transferencias internacionales de grandes montos) y la escala del procesamiento. Ello habría exigido medidas técnicas y organizativas específicas que posiblemente habrían detectado la vulnerabilidad del CSP antes del ataque.',
+  },
 ]
 
 const REFORMA_ITEMS = [
@@ -143,6 +194,8 @@ const REFORMA_ITEMS = [
 export default function Datos() {
   const [arcoAbierto, setArcoAbierto] = useState(null)
   const [oblAbierta, setOblAbierta] = useState(null)
+  const [verReforma, setVerReforma] = useState(false)
+  const [filaGdpr, setFilaGdpr] = useState(null)
 
   return (
     <motion.div
@@ -253,10 +306,24 @@ export default function Datos() {
 
       {/* ── Sección 3: Obligaciones del banco ──────────────────── */}
       <div className="mb-10">
-        <h3 className="text-xl font-bold text-gray-800 mb-1">El banco como responsable del tratamiento</h3>
-        <p className="text-sm text-gray-500 mb-5">
-          Obligaciones del Art. 2 Ley 19.628 — situación al momento del ataque.
-        </p>
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+          <div>
+            <h3 className="text-xl font-bold text-gray-800">El banco como responsable del tratamiento</h3>
+            <p className="text-sm text-gray-500">Obligaciones del Art. 2 Ley 19.628 — situación al momento del ataque.</p>
+          </div>
+          {/* Toggle Ley 21.719 */}
+          <button
+            onClick={() => setVerReforma(!verReforma)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
+              verReforma
+                ? 'bg-purple-700 text-white border-purple-700'
+                : 'bg-white text-purple-700 border-purple-300 hover:border-purple-500'
+            }`}
+          >
+            <span className={`w-3 h-3 rounded-full transition-colors ${verReforma ? 'bg-green-300' : 'bg-gray-300'}`} />
+            {verReforma ? 'Mostrando Ley 21.719' : 'Ver cambios bajo Ley 21.719'}
+          </button>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-4">
           {OBLIGACIONES.map((ob, i) => {
@@ -280,6 +347,11 @@ export default function Datos() {
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_STYLE[ob.estado]}`}>
                         {ob.estado}
                       </span>
+                      {verReforma && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${REFORMA_BADGE_STYLE[ob.reforma.badge]}`}>
+                          21.719: {ob.reforma.badge}
+                        </span>
+                      )}
                     </div>
                     <span className="text-xs text-purple-600 font-mono">{ob.norma}</span>
                   </div>
@@ -301,6 +373,25 @@ export default function Datos() {
                           {ob.cita}
                         </blockquote>
                         <p className="text-sm text-gray-600">{ob.situacion}</p>
+
+                        <AnimatePresence>
+                          {verReforma && (
+                            <motion.div
+                              key="reforma"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.2 }}
+                              style={{ overflow: 'hidden' }}
+                              className="mt-3 bg-green-50 border border-green-200 rounded-lg px-4 py-3"
+                            >
+                              <p className="text-xs font-semibold text-green-700 mb-1">
+                                Bajo Ley 21.719 — <span className="font-mono">{ob.reforma.norma}</span>
+                              </p>
+                              <p className="text-xs text-green-900">{ob.reforma.texto}</p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </motion.div>
                   )}
@@ -404,6 +495,7 @@ export default function Datos() {
           <div className="px-5 py-3 text-white text-sm font-semibold" style={{ background: 'linear-gradient(90deg, #3730a3, #7c3aed)' }}>
             Comparación: Ley 19.628 (Chile 2018) vs. GDPR (UE 2018)
           </div>
+          <p className="px-4 pt-2 pb-1 text-xs text-gray-400">Haz click en una fila para ver el impacto concreto en el caso Banco de Chile</p>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
@@ -414,24 +506,55 @@ export default function Datos() {
                 </tr>
               </thead>
               <tbody>
-                {GDPR_ROWS.map((row, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}>
-                    <td className="px-4 py-2.5 font-medium text-gray-700 border-b border-gray-100">{row.aspecto}</td>
-                    <td className="px-4 py-2.5 text-center border-b border-gray-100">
-                      <span className="inline-block bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs">
-                        {row.chile}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5 text-center border-b border-gray-100">
-                      <span className="inline-block bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs">
-                        {row.gdpr}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {GDPR_ROWS.map((row, i) => {
+                  const seleccionada = filaGdpr === i
+                  return (
+                    <tr
+                      key={i}
+                      onClick={() => setFilaGdpr(seleccionada ? null : i)}
+                      className={`cursor-pointer transition-colors ${seleccionada ? 'bg-indigo-50' : i % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50/60 hover:bg-gray-100'}`}
+                    >
+                      <td className="px-4 py-2.5 font-medium text-gray-700 border-b border-gray-100">
+                        <span className="flex items-center gap-1">
+                          {seleccionada && <span className="text-indigo-500">▶</span>}
+                          {row.aspecto}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-center border-b border-gray-100">
+                        <span className="inline-block bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs">
+                          {row.chile}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-center border-b border-gray-100">
+                        <span className="inline-block bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs">
+                          {row.gdpr}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
+          {/* Panel de detalle GDPR */}
+          <AnimatePresence mode="wait">
+            {filaGdpr !== null && (
+              <motion.div
+                key={filaGdpr}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.22 }}
+                style={{ overflow: 'hidden' }}
+                className="border-t border-indigo-200 bg-indigo-50 px-5 py-4"
+              >
+                <p className="text-xs font-semibold text-indigo-700 mb-1">
+                  Impacto en el caso Banco de Chile 2018 — {GDPR_ROWS[filaGdpr].aspecto}
+                </p>
+                <p className="text-xs text-indigo-900 leading-relaxed">{GDPR_ROWS[filaGdpr].detalle}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
