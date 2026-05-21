@@ -28,12 +28,12 @@ const cardVariants = {
 }
 
 const NIVEL_STYLE = {
-  'Alta':       { badge: 'bg-red-100 text-red-800 border border-red-300',          dot: 'bg-red-500',    matrizBg: 'bg-red-50'     },
-  'Media-Alta': { badge: 'bg-orange-100 text-orange-800 border border-orange-300',  dot: 'bg-orange-500', matrizBg: 'bg-orange-50'  },
-  'Media':      { badge: 'bg-yellow-100 text-yellow-800 border border-yellow-300',  dot: 'bg-yellow-500', matrizBg: 'bg-yellow-50'  },
-  'Baja':       { badge: 'bg-blue-100 text-blue-800 border border-blue-300',        dot: 'bg-blue-500',   matrizBg: 'bg-blue-50'    },
-  'Propia':     { badge: 'bg-purple-100 text-purple-700 border border-purple-300',  dot: 'bg-purple-400', matrizBg: 'bg-purple-50'  },
-  'N/A':        { badge: 'bg-gray-100 text-gray-500 border border-gray-200',        dot: 'bg-gray-400',   matrizBg: 'bg-gray-50'    },
+  'Alta':       { badge: 'bg-red-100 text-red-800 border border-red-300',          dot: 'bg-red-500',    matrizBg: 'bg-red-50'    },
+  'Media-Alta': { badge: 'bg-orange-100 text-orange-800 border border-orange-300',  dot: 'bg-orange-500', matrizBg: 'bg-orange-50' },
+  'Media':      { badge: 'bg-yellow-100 text-yellow-800 border border-yellow-300',  dot: 'bg-yellow-500', matrizBg: 'bg-yellow-50' },
+  'Baja':       { badge: 'bg-blue-100 text-blue-800 border border-blue-300',        dot: 'bg-blue-500',   matrizBg: 'bg-blue-50'   },
+  'Propia':     { badge: 'bg-purple-100 text-purple-700 border border-purple-300',  dot: 'bg-purple-400', matrizBg: 'bg-purple-50' },
+  'N/A':        { badge: 'bg-gray-100 text-gray-500 border border-gray-200',        dot: 'bg-gray-400',   matrizBg: 'bg-gray-50'   },
 }
 
 /* ─── Stats ──────────────────────────────────────────────────── */
@@ -55,23 +55,23 @@ const MATRIZ = {
 }
 
 const TOOLTIP = {
-  'Penal-Atacantes':                'Arts. 2, 3, 4, 6, 8, 10 — Ley 21.459',
-  'Penal-Banco de Chile':           'Ley 20.393 (personas jurídicas — limitada)',
-  'Penal-Directivos':               'Requiere dolo probado — no hay indicios',
-  'Civil-Atacantes':                'Arts. 2314 y 2329 Código Civil',
-  'Civil-Banco de Chile':           'Arts. 1547 CC + Art. 23 Ley 19.628',
-  'Civil-Directivos':               'Art. 133 — Ley de Sociedades Anónimas',
-  'Administrativa-Banco de Chile':  'Circular CMF N°3.506 + SWIFT CSP',
-  'Administrativa-Directivos':      'Arts. 39 y ss. — Ley General de Bancos',
-  'Administrativa-SWIFT':           'SWIFT CSP — auditoría propia a miembros',
+  'Penal-Atacantes':               'Arts. 2, 3, 4, 6, 8, 10 — Ley 21.459',
+  'Penal-Banco de Chile':          'Ley 20.393 (personas jurídicas — limitada)',
+  'Penal-Directivos':              'Requiere dolo probado — no hay indicios',
+  'Civil-Atacantes':               'Arts. 2314 y 2329 Código Civil',
+  'Civil-Banco de Chile':          'Arts. 1547 CC + Art. 23 Ley 19.628',
+  'Civil-Directivos':              'Art. 133 — Ley de Sociedades Anónimas',
+  'Administrativa-Banco de Chile': 'Circular CMF N°3.506 + SWIFT CSP',
+  'Administrativa-Directivos':     'Arts. 39 y ss. — Ley General de Bancos',
+  'Administrativa-SWIFT':          'SWIFT CSP — auditoría propia a miembros',
 }
 
 const COL_HEADER_BG = {
-  'Atacantes':     'bg-red-900',
-  'Banco de Chile':'bg-blue-900',
-  'Directivos':    'bg-orange-900',
-  'SWIFT':         'bg-purple-900',
-  'CMF':           'bg-gray-700',
+  'Atacantes':      'bg-red-900',
+  'Banco de Chile': 'bg-blue-900',
+  'Directivos':     'bg-orange-900',
+  'SWIFT':          'bg-purple-900',
+  'CMF':            'bg-gray-700',
 }
 
 /* ─── Actores ─────────────────────────────────────────────────── */
@@ -82,15 +82,19 @@ const ACTORES = [
     icono: '⚡',
     colorBg: 'bg-red-900/20', colorBorder: 'border-red-700',
     colorText: 'text-red-300', colorBadge: 'bg-red-500',
+    colorSectionLabel: 'text-red-300',
+    colorSectionBorder: 'border-l-red-500',
+    colorTableHeader: 'bg-red-900',
+    colorTextBox: 'bg-red-950/30 text-red-100',
     penal: {
       nivel: 'Alta',
       filas: [
-        { tipo: 'Acceso ilícito',                  norma: 'Art. 2 Ley 21.459',  desc: 'Ingresaron sin autorización a la red del banco superando controles de seguridad' },
-        { tipo: 'Interceptación ilícita',           norma: 'Art. 3 Ley 21.459',  desc: 'Capturaron credenciales SWIFT de los operadores del banco' },
-        { tipo: 'Ataque a la integridad',           norma: 'Art. 4 Ley 21.459',  desc: 'Destruyeron el MBR de ~9.000 equipos con el malware KillMBR' },
-        { tipo: 'Fraude informático',               norma: 'Art. 6 Ley 21.459',  desc: 'Ejecutaron transferencias SWIFT fraudulentas por USD 10M' },
-        { tipo: 'Abuso de dispositivos',            norma: 'Art. 8 Ley 21.459',  desc: 'Utilizaron herramientas de hacking y malware especializado' },
-        { tipo: 'Agravante — infra. crítica',       norma: 'Art. 10 Ley 21.459', desc: 'El banco forma parte del sistema financiero crítico nacional' },
+        { tipo: 'Acceso ilícito',             norma: 'Art. 2 Ley 21.459',  desc: 'Ingresaron sin autorización a la red del banco superando controles de seguridad' },
+        { tipo: 'Interceptación ilícita',      norma: 'Art. 3 Ley 21.459',  desc: 'Capturaron credenciales SWIFT de los operadores del banco' },
+        { tipo: 'Ataque a la integridad',      norma: 'Art. 4 Ley 21.459',  desc: 'Destruyeron el MBR de ~9.000 equipos con el malware KillMBR' },
+        { tipo: 'Fraude informático',          norma: 'Art. 6 Ley 21.459',  desc: 'Ejecutaron transferencias SWIFT fraudulentas por USD 10M' },
+        { tipo: 'Abuso de dispositivos',       norma: 'Art. 8 Ley 21.459',  desc: 'Utilizaron herramientas de hacking y malware especializado' },
+        { tipo: 'Agravante — infra. crítica',  norma: 'Art. 10 Ley 21.459', desc: 'El banco forma parte del sistema financiero crítico nacional' },
       ],
       nota: 'Pena acumulada estimada: presidio mayor grado mínimo a medio (5 años 1 día — 15 años).',
     },
@@ -116,6 +120,10 @@ const ACTORES = [
     icono: '🏦',
     colorBg: 'bg-blue-900/20', colorBorder: 'border-blue-700',
     colorText: 'text-blue-300', colorBadge: 'bg-blue-500',
+    colorSectionLabel: 'text-blue-300',
+    colorSectionBorder: 'border-l-blue-500',
+    colorTableHeader: 'bg-blue-900',
+    colorTextBox: 'bg-blue-950/30 text-blue-100',
     penal: {
       nivel: 'Baja',
       texto: 'Las personas jurídicas no tienen responsabilidad penal directa bajo Ley 21.459. Podría aplicar Ley 20.393 solo si se probara omisión culpable de un directivo que facilitó el delito.',
@@ -123,17 +131,17 @@ const ACTORES = [
     civil: {
       nivel: 'Media-Alta',
       filas: [
-        { tipo: 'Responsabilidad contractual',    norma: 'Art. 1547 CC',           desc: 'Incumplimiento de la obligación de custodia segura de fondos y datos de clientes' },
-        { tipo: 'Tratamiento de datos',           norma: 'Art. 23 Ley 19.628',     desc: 'Responsabilidad por daños derivados del tratamiento deficiente de datos personales' },
-        { tipo: 'Protección al consumidor',       norma: 'Art. 23 Ley 19.496',     desc: 'Acción disponible si clientes sufrieron fondos no disponibles o datos expuestos' },
+        { tipo: 'Responsabilidad contractual', norma: 'Art. 1547 CC',        desc: 'Incumplimiento de la obligación de custodia segura de fondos y datos de clientes' },
+        { tipo: 'Tratamiento de datos',        norma: 'Art. 23 Ley 19.628',  desc: 'Responsabilidad por daños derivados del tratamiento deficiente de datos personales' },
+        { tipo: 'Protección al consumidor',    norma: 'Art. 23 Ley 19.496',  desc: 'Acción disponible si clientes sufrieron fondos no disponibles o datos expuestos' },
       ],
     },
     administrativa: {
       nivel: 'Alta',
       filas: [
-        { tipo: 'Gestión de riesgo tecnológico',  norma: 'Circular CMF N°3.506',   desc: 'El ataque evidenció ausencias en controles de seguridad exigidos a entidades bancarias' },
-        { tipo: 'Controles SWIFT',                norma: 'SWIFT CSP',              desc: 'No tenía implementados todos los controles obligatorios del Customer Security Programme' },
-        { tipo: 'Plan de respuesta a incidentes', norma: 'Normativa SBIF',         desc: 'La respuesta fue reactiva; tardó en detectar las transferencias fraudulentas' },
+        { tipo: 'Gestión de riesgo tecnológico',  norma: 'Circular CMF N°3.506', desc: 'El ataque evidenció ausencias en controles de seguridad exigidos a entidades bancarias' },
+        { tipo: 'Controles SWIFT',                norma: 'SWIFT CSP',            desc: 'No tenía implementados todos los controles obligatorios del Customer Security Programme' },
+        { tipo: 'Plan de respuesta a incidentes', norma: 'Normativa SBIF',        desc: 'La respuesta fue reactiva; tardó en detectar las transferencias fraudulentas' },
       ],
       nota: 'Consecuencia: multa CMF + plan de mejoras. El banco invirtió decenas de millones en modernización tecnológica.',
     },
@@ -144,6 +152,10 @@ const ACTORES = [
     icono: '👔',
     colorBg: 'bg-orange-900/20', colorBorder: 'border-orange-700',
     colorText: 'text-orange-300', colorBadge: 'bg-orange-500',
+    colorSectionLabel: 'text-orange-300',
+    colorSectionBorder: 'border-l-orange-500',
+    colorTableHeader: 'bg-orange-900',
+    colorTextBox: 'bg-orange-950/30 text-orange-100',
     penal: {
       nivel: 'Baja',
       texto: 'Requiere probar participación dolosa o complicidad en la omisión de medidas de seguridad. No hay indicios de ello en el caso Banco de Chile.',
@@ -151,15 +163,15 @@ const ACTORES = [
     civil: {
       nivel: 'Media',
       filas: [
-        { tipo: 'Responsabilidad solidaria',      norma: 'Art. 133 LSA',           desc: 'Directores responden solidariamente ante accionistas por perjuicios causados por negligencia' },
+        { tipo: 'Responsabilidad solidaria', norma: 'Art. 133 LSA', desc: 'Directores responden solidariamente ante accionistas por perjuicios causados por negligencia' },
       ],
       nota: 'La pregunta clave: ¿el directorio ignoró señales de alerta de seguridad? De probarse, constituiría negligencia grave.',
     },
     administrativa: {
       nivel: 'Media',
       filas: [
-        { tipo: 'Deberes de diligencia',          norma: 'Arts. 39 y ss. LGB',     desc: 'La normativa bancaria establece deberes específicos de diligencia para directores' },
-        { tipo: 'Investigación CMF',              norma: 'Ley General de Bancos',  desc: 'Ejecutivos responsables de TI y seguridad podían enfrentar investigación administrativa' },
+        { tipo: 'Deberes de diligencia', norma: 'Arts. 39 y ss. LGB',    desc: 'La normativa bancaria establece deberes específicos de diligencia para directores' },
+        { tipo: 'Investigación CMF',     norma: 'Ley General de Bancos', desc: 'Ejecutivos responsables de TI y seguridad podían enfrentar investigación administrativa' },
       ],
     },
   },
@@ -169,6 +181,10 @@ const ACTORES = [
     icono: '🌐',
     colorBg: 'bg-purple-900/20', colorBorder: 'border-purple-700',
     colorText: 'text-purple-300', colorBadge: 'bg-purple-500',
+    colorSectionLabel: 'text-purple-300',
+    colorSectionBorder: 'border-l-purple-500',
+    colorTableHeader: 'bg-purple-900',
+    colorTextBox: 'bg-purple-950/30 text-purple-100',
     penal: {
       nivel: 'N/A',
       texto: 'Sin responsabilidad penal bajo derecho chileno. SWIFT es una organización internacional con sede en Bélgica, fuera del alcance jurisdiccional de Chile.',
@@ -188,6 +204,10 @@ const ACTORES = [
     icono: '🏛️',
     colorBg: 'bg-gray-800/40', colorBorder: 'border-gray-600',
     colorText: 'text-gray-300', colorBadge: 'bg-gray-500',
+    colorSectionLabel: 'text-gray-300',
+    colorSectionBorder: 'border-l-gray-500',
+    colorTableHeader: 'bg-gray-700',
+    colorTextBox: 'bg-gray-800/50 text-gray-200',
     penal: {
       nivel: 'N/A',
       texto: 'Ninguna responsabilidad penal directa. La CMF actúa como regulador, no como parte activa del incidente.',
@@ -204,11 +224,11 @@ const ACTORES = [
 ]
 
 const RESUMEN = [
-  { actor: 'Atacantes (Lazarus)',  penal: 'Alta',       civil: 'Alta',       adm: 'N/A'    },
-  { actor: 'Banco de Chile',       penal: 'Baja',       civil: 'Media-Alta', adm: 'Alta'   },
-  { actor: 'Directivos del banco', penal: 'Baja',       civil: 'Media',      adm: 'Media'  },
-  { actor: 'SWIFT',                penal: 'N/A',        civil: 'N/A',        adm: 'Propia' },
-  { actor: 'CMF',                  penal: 'N/A',        civil: 'N/A',        adm: 'N/A'    },
+  { actor: 'Atacantes (Lazarus)',  penal: 'Alta',  civil: 'Alta',       adm: 'N/A'    },
+  { actor: 'Banco de Chile',       penal: 'Baja',  civil: 'Media-Alta', adm: 'Alta'   },
+  { actor: 'Directivos del banco', penal: 'Baja',  civil: 'Media',      adm: 'Media'  },
+  { actor: 'SWIFT',                penal: 'N/A',   civil: 'N/A',        adm: 'Propia' },
+  { actor: 'CMF',                  penal: 'N/A',   civil: 'N/A',        adm: 'N/A'    },
 ]
 
 function NivelBadge({ nivel }) {
@@ -221,20 +241,20 @@ function NivelBadge({ nivel }) {
   )
 }
 
-function TablaDetail({ filas }) {
+function TablaDetail({ filas, headerClass }) {
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-700">
       <table className="w-full text-xs border-collapse min-w-[400px]">
         <thead>
           <tr>
-            <th className="text-left p-2.5 bg-gray-800 text-gray-200 rounded-tl-lg w-36">Tipo</th>
-            <th className="text-left p-2.5 bg-gray-800 text-gray-200 w-40">Norma</th>
-            <th className="text-left p-2.5 bg-gray-800 text-gray-200 rounded-tr-lg">Descripción</th>
+            <th className={`text-left p-2.5 text-white rounded-tl-lg w-36 ${headerClass}`}>Tipo</th>
+            <th className={`text-left p-2.5 text-white w-40 ${headerClass}`}>Norma</th>
+            <th className={`text-left p-2.5 text-white rounded-tr-lg ${headerClass}`}>Descripción</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-800">
           {filas.map((f, i) => (
-            <tr key={i} className="bg-gray-900/50">
+            <tr key={i} className="bg-gray-900/60 hover:bg-gray-800/60 transition-colors">
               <td className="p-2.5 text-white font-medium">{f.tipo}</td>
               <td className="p-2.5 text-amber-300 font-mono text-xs">{f.norma}</td>
               <td className="p-2.5 text-gray-300">{f.desc}</td>
@@ -319,32 +339,18 @@ export default function Responsabilidades() {
                     const nivel = MATRIZ[tipo][actor]
                     const st    = NIVEL_STYLE[nivel]
                     const key   = `${tipo}-${actor}`
-                    const tip   = TOOLTIP[key]
+                    const isHovered = hoveredCell === key
                     return (
                       <td
                         key={actor}
-                        className={`p-2 text-center relative ${st.matrizBg}`}
+                        className={`p-2 text-center transition-all cursor-default ${isHovered ? 'brightness-90' : ''} ${st.matrizBg}`}
                         onMouseEnter={() => setHoveredCell(key)}
                         onMouseLeave={() => setHoveredCell(null)}
                       >
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold cursor-default ${st.badge}`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${isHovered ? 'ring-2 ring-offset-1 ring-gray-400' : ''} ${st.badge}`}>
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.dot}`} />
                           {nivel}
                         </span>
-                        <AnimatePresence>
-                          {hoveredCell === key && tip && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 4 }}
-                              transition={{ duration: 0.15 }}
-                              className="absolute z-20 left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none"
-                            >
-                              <p className="text-gray-300 leading-snug">{tip}</p>
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
                       </td>
                     )
                   })}
@@ -354,8 +360,27 @@ export default function Responsabilidades() {
           </table>
         </div>
 
+        {/* Panel de norma — aparece al hacer hover sobre una celda */}
+        <AnimatePresence mode="wait">
+          {hoveredCell && TOOLTIP[hoveredCell] ? (
+            <motion.div
+              key={hoveredCell}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18 }}
+              className="mt-3 bg-gray-800 text-white text-xs rounded-xl px-4 py-3 flex items-center gap-3 shadow-md"
+            >
+              <span className="text-amber-400 font-semibold shrink-0">Norma →</span>
+              <span className="text-gray-200">{TOOLTIP[hoveredCell]}</span>
+            </motion.div>
+          ) : (
+            <div className="mt-3 h-9" />
+          )}
+        </AnimatePresence>
+
         {/* Leyenda */}
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-2">
           {Object.entries(NIVEL_STYLE).map(([nivel, st]) => (
             <span key={nivel} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${st.badge}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
@@ -395,8 +420,8 @@ export default function Responsabilidades() {
                       <p className="font-semibold text-white text-sm leading-tight">{actor.nombre}</p>
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {[
-                          { label: 'Penal',  nivel: actor.penal.nivel  },
-                          { label: 'Civil',  nivel: actor.civil.nivel  },
+                          { label: 'Penal',  nivel: actor.penal.nivel         },
+                          { label: 'Civil',  nivel: actor.civil.nivel         },
                           { label: 'Adm.',   nivel: actor.administrativa.nivel },
                         ].map(({ label, nivel }) => (
                           <span key={label} className={`text-xs px-1.5 py-0.5 rounded border ${NIVEL_STYLE[nivel].badge}`}>
@@ -425,7 +450,7 @@ export default function Responsabilidades() {
                       transition={{ duration: 0.3, ease: 'easeInOut' }}
                       className="overflow-hidden"
                     >
-                      <div className="px-5 pb-5 pt-1 space-y-5 bg-gray-950/40">
+                      <div className="px-5 pb-5 pt-2 space-y-5 bg-black/20">
 
                         {/* Obstáculos prácticos — solo atacantes */}
                         {actor.obstaculos && (
@@ -442,14 +467,14 @@ export default function Responsabilidades() {
                         )}
 
                         {/* Penal */}
-                        <div>
+                        <div className={`border-l-4 pl-4 ${actor.colorSectionBorder}`}>
                           <div className="flex items-center gap-2 mb-2">
-                            <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Responsabilidad penal</p>
+                            <p className={`text-xs uppercase tracking-widest font-semibold ${actor.colorSectionLabel}`}>Responsabilidad penal</p>
                             <NivelBadge nivel={actor.penal.nivel} />
                           </div>
                           {actor.penal.filas
-                            ? <TablaDetail filas={actor.penal.filas} />
-                            : <p className="text-sm text-gray-300 bg-gray-900/50 rounded-lg px-4 py-3">{actor.penal.texto}</p>
+                            ? <TablaDetail filas={actor.penal.filas} headerClass={actor.colorTableHeader} />
+                            : <p className={`text-sm rounded-lg px-4 py-3 ${actor.colorTextBox}`}>{actor.penal.texto}</p>
                           }
                           {actor.penal.nota && (
                             <p className="text-xs text-amber-300 mt-2 italic">{actor.penal.nota}</p>
@@ -457,14 +482,14 @@ export default function Responsabilidades() {
                         </div>
 
                         {/* Civil */}
-                        <div>
+                        <div className={`border-l-4 pl-4 ${actor.colorSectionBorder}`}>
                           <div className="flex items-center gap-2 mb-2">
-                            <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Responsabilidad civil</p>
+                            <p className={`text-xs uppercase tracking-widest font-semibold ${actor.colorSectionLabel}`}>Responsabilidad civil</p>
                             <NivelBadge nivel={actor.civil.nivel} />
                           </div>
                           {actor.civil.filas
-                            ? <TablaDetail filas={actor.civil.filas} />
-                            : <p className="text-sm text-gray-300 bg-gray-900/50 rounded-lg px-4 py-3">{actor.civil.texto}</p>
+                            ? <TablaDetail filas={actor.civil.filas} headerClass={actor.colorTableHeader} />
+                            : <p className={`text-sm rounded-lg px-4 py-3 ${actor.colorTextBox}`}>{actor.civil.texto}</p>
                           }
                           {actor.civil.nota && (
                             <p className="text-xs text-amber-300 mt-2 italic">{actor.civil.nota}</p>
@@ -472,14 +497,14 @@ export default function Responsabilidades() {
                         </div>
 
                         {/* Administrativa */}
-                        <div>
+                        <div className={`border-l-4 pl-4 ${actor.colorSectionBorder}`}>
                           <div className="flex items-center gap-2 mb-2">
-                            <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Responsabilidad administrativa</p>
+                            <p className={`text-xs uppercase tracking-widest font-semibold ${actor.colorSectionLabel}`}>Responsabilidad administrativa</p>
                             <NivelBadge nivel={actor.administrativa.nivel} />
                           </div>
                           {actor.administrativa.filas
-                            ? <TablaDetail filas={actor.administrativa.filas} />
-                            : <p className="text-sm text-gray-300 bg-gray-900/50 rounded-lg px-4 py-3">{actor.administrativa.texto}</p>
+                            ? <TablaDetail filas={actor.administrativa.filas} headerClass={actor.colorTableHeader} />
+                            : <p className={`text-sm rounded-lg px-4 py-3 ${actor.colorTextBox}`}>{actor.administrativa.texto}</p>
                           }
                           {actor.administrativa.nota && (
                             <p className="text-xs text-amber-300 mt-2 italic">{actor.administrativa.nota}</p>
