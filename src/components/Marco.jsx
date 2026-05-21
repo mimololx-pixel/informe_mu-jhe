@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -9,10 +10,11 @@ const cardVariants = {
   })
 }
 
-const badgeEstado = (estado) => {
-  if (estado.includes('Derogada'))                          return 'bg-red-100 text-red-700'
-  if (estado.includes('reforma') || estado.includes('implementación')) return 'bg-yellow-100 text-yellow-700'
-  return 'bg-green-100 text-green-700'
+const ESTADO_BADGE = {
+  'Vigente':       'bg-green-100 text-green-700',
+  'Derogada':      'bg-red-100 text-red-700',
+  'En reforma':    'bg-yellow-100 text-yellow-700',
+  'Internacional': 'bg-indigo-100 text-indigo-700',
 }
 
 const DIMENSIONES = ['Penal', 'Datos', 'Regulatorio', 'Cooperación', 'Técnico']
@@ -30,109 +32,156 @@ const COBERTURA = [
   { norma: 'GDPR',           valores: ['none', 'full', 'full', 'partial', 'partial'] },
 ]
 
-const COB_COLOR = { full: 'bg-green-500', partial: 'bg-yellow-400', none: 'bg-gray-200' }
-const COB_LABEL = { full: 'Cubre directamente', partial: 'Cubre parcialmente', none: 'No aplica' }
+const COB_COLOR = {
+  full:    'bg-green-500',
+  partial: 'bg-yellow-400',
+  none:    'bg-gray-200',
+}
+const COB_LABEL = {
+  full:    'Cubre directamente',
+  partial: 'Cubre parcialmente',
+  none:    'No aplica',
+}
+
+const NORMAS = [
+  {
+    id: 'ley19223',
+    num: '1',
+    nombre: 'Ley 19.223 (1993) — Delitos informáticos',
+    tipo: 'Nacional',
+    estado: 'Derogada',
+    ambito: 'Primera ley chilena de delitos informáticos.',
+    relevancia: 'Vigente al momento del ataque. Tipificaba el sabotaje informático (KillMBR) y el acceso no autorizado. Considerada insuficiente para ataques de esta escala.',
+    estadoTexto: 'Derogada — reemplazada por Ley 21.459 (2022)',
+    articulos: [],
+  },
+  {
+    id: 'ley21459',
+    num: '2',
+    nombre: 'Ley 21.459 (2022) — Normas sobre delitos informáticos',
+    tipo: 'Nacional',
+    estado: 'Vigente',
+    ambito: 'Moderniza el derecho penal informático conforme al Convenio de Budapest.',
+    relevancia: 'Si el incidente ocurriera hoy, sería el principal cuerpo normativo.',
+    estadoTexto: 'Vigente',
+    articulos: [
+      'Art. 2 — Acceso ilícito a sistema informático',
+      'Art. 3 — Interceptación ilícita de datos',
+      'Art. 4 — Ataque a la integridad de un sistema (KillMBR)',
+      'Art. 6 — Fraude informático (transferencias SWIFT)',
+      'Art. 8 — Abuso de dispositivos (uso de malware)',
+      'Art. 10 — Agravante por infraestructura crítica',
+    ],
+  },
+  {
+    id: 'ley19628',
+    num: '3',
+    nombre: 'Ley 19.628 (1999) — Protección de datos personales',
+    tipo: 'Nacional',
+    estado: 'En reforma',
+    ambito: 'Regula el tratamiento de datos personales en Chile.',
+    relevancia: 'El banco custodiaba datos de millones de clientes. La brecha comprometió datos financieros (RUT, cuentas, saldos).',
+    estadoTexto: 'Vigente (con reforma Ley 21.719 en implementación)',
+    articulos: [
+      'Art. 11 — Deber de custodia y seguridad',
+      'Art. 12 — Derechos de los titulares (ARCO)',
+      'Art. 23 — Responsabilidad por daños',
+    ],
+  },
+  {
+    id: 'dfl3',
+    num: '4',
+    nombre: 'Ley General de Bancos (DFL N°3 de 1997)',
+    tipo: 'Nacional',
+    estado: 'Vigente',
+    ambito: 'Regula las operaciones bancarias en Chile.',
+    relevancia: 'Establece obligaciones de gestión de riesgo operacional y tecnológico para entidades financieras supervisadas por la CMF.',
+    estadoTexto: 'Vigente',
+    articulos: ['Art. 70 — Obligación de gestión prudente y segura de los recursos'],
+  },
+  {
+    id: 'cmf',
+    num: '5',
+    nombre: 'Normativa CMF — Circular N°3.506 y sucesoras',
+    tipo: 'Nacional',
+    estado: 'Vigente',
+    ambito: 'Regulación de gestión de riesgo tecnológico y ciberseguridad para bancos.',
+    relevancia: 'El ataque evidenció incumplimientos en estándares mínimos de seguridad exigidos por la SBIF (hoy CMF), dando base para sanciones administrativas.',
+    estadoTexto: 'Vigente (actualizada)',
+    articulos: [],
+  },
+  {
+    id: 'budapest',
+    num: '6',
+    nombre: 'Convenio de Budapest (2001)',
+    tipo: 'Internacional',
+    estado: 'Internacional',
+    ambito: 'Tratado internacional que estandariza los delitos informáticos.',
+    relevancia: 'Chile se adhirió en 2023 (no en 2018). Hubiera sido el marco de cooperación internacional para investigar el ataque.',
+    estadoTexto: 'Convenio internacional',
+    articulos: [],
+  },
+  {
+    id: 'swiftcsp',
+    num: '7',
+    nombre: 'SWIFT Customer Security Programme (CSP)',
+    tipo: 'Internacional',
+    estado: 'Internacional',
+    ambito: 'Controles de seguridad obligatorios para todos los usuarios de la red SWIFT.',
+    relevancia: 'El ataque explotó credenciales SWIFT. El banco debía cumplir con autenticación multifactor, monitoreo de transacciones y segregación de redes.',
+    estadoTexto: 'Norma sectorial internacional',
+    articulos: [],
+  },
+  {
+    id: 'basilea',
+    num: '8',
+    nombre: 'Basilea III — Comité de Supervisión Bancaria de Basilea',
+    tipo: 'Internacional',
+    estado: 'Internacional',
+    ambito: 'Marco internacional para la gestión del riesgo operacional bancario.',
+    relevancia: 'El riesgo tecnológico es parte del riesgo operacional. El ataque evidenció deficiencias en los modelos de gestión de riesgo del banco.',
+    estadoTexto: 'Marco internacional bancario',
+    articulos: [],
+  },
+  {
+    id: 'iso27001',
+    num: '9',
+    nombre: 'ISO/IEC 27001:2013 — Seguridad de la información',
+    tipo: 'Internacional',
+    estado: 'Internacional',
+    ambito: 'Estándar internacional de gestión de seguridad.',
+    relevancia: 'La CMF lo referencia. El ataque mostró ausencias en A.12.6 (gestión de vulnerabilidades) y A.16.1 (gestión de incidentes).',
+    estadoTexto: 'Estándar internacional',
+    articulos: [],
+  },
+  {
+    id: 'gdpr',
+    num: '10',
+    nombre: 'GDPR — Reglamento General de Protección de Datos (UE, 2018)',
+    tipo: 'Internacional',
+    estado: 'Internacional',
+    ambito: 'Regulación europea de protección de datos.',
+    relevancia: 'Valor comparativo: si el banco operara en la UE, habría enfrentado notificación en 72h y multas de hasta 4% de facturación global. Ilustra la brecha con la Ley 19.628 chilena.',
+    estadoTexto: 'Referencia comparativa (no aplica directamente a Chile)',
+    articulos: [],
+  },
+]
 
 export default function Marco() {
-  const nacionales = [
-    {
-      num: '1',
-      nombre: 'Ley 19.223 (1993) — Delitos informáticos',
-      ambito: 'Primera ley chilena de delitos informáticos.',
-      relevancia: 'Vigente al momento del ataque. Tipificaba el sabotaje informático (KillMBR) y el acceso no autorizado. Considerada insuficiente para ataques de esta escala.',
-      estado: 'Derogada — reemplazada por Ley 21.459 (2022)',
-      articulos: [],
-    },
-    {
-      num: '2',
-      nombre: 'Ley 21.459 (2022) — Normas sobre delitos informáticos',
-      ambito: 'Moderniza el derecho penal informático conforme al Convenio de Budapest.',
-      relevancia: 'Si el incidente ocurriera hoy, sería el principal cuerpo normativo.',
-      estado: 'Vigente',
-      articulos: [
-        'Art. 2 — Acceso ilícito a sistema informático',
-        'Art. 3 — Interceptación ilícita de datos',
-        'Art. 4 — Ataque a la integridad de un sistema (KillMBR)',
-        'Art. 6 — Fraude informático (transferencias SWIFT)',
-        'Art. 8 — Abuso de dispositivos (uso de malware)',
-        'Art. 10 — Agravante por infraestructura crítica',
-      ],
-    },
-    {
-      num: '3',
-      nombre: 'Ley 19.628 (1999) — Protección de datos personales',
-      ambito: 'Regula el tratamiento de datos personales en Chile.',
-      relevancia: 'El banco custodiaba datos de millones de clientes. La brecha comprometió datos financieros (RUT, cuentas, saldos).',
-      estado: 'Vigente (con reforma Ley 21.719 en implementación)',
-      articulos: [
-        'Art. 11 — Deber de custodia y seguridad',
-        'Art. 12 — Derechos de los titulares (ARCO)',
-        'Art. 23 — Responsabilidad por daños',
-      ],
-    },
-    {
-      num: '4',
-      nombre: 'Ley General de Bancos (DFL N°3 de 1997)',
-      ambito: 'Regula las operaciones bancarias en Chile.',
-      relevancia: 'Establece obligaciones de gestión de riesgo operacional y tecnológico para entidades financieras supervisadas por la CMF.',
-      estado: 'Vigente',
-      articulos: ['Art. 70 — Obligación de gestión prudente y segura de los recursos'],
-    },
-    {
-      num: '5',
-      nombre: 'Normativa CMF — Circular N°3.506 y sucesoras',
-      ambito: 'Regulación de gestión de riesgo tecnológico y ciberseguridad para bancos.',
-      relevancia: 'El ataque evidenció incumplimientos en estándares mínimos de seguridad exigidos por la SBIF (hoy CMF), dando base para sanciones administrativas.',
-      estado: 'Vigente (actualizada)',
-      articulos: [],
-    },
-  ]
+  const [filtroTipo,   setFiltroTipo]   = useState('Todos')
+  const [filtroEstado, setFiltroEstado] = useState('Todos')
+  const [normaAbierta, setNormaAbierta] = useState(null)
+  const [normaDestacada, setNormaDestacada] = useState(null)
+  const [dimDestacada,   setDimDestacada]   = useState(null)
 
-  const internacionales = [
-    {
-      num: '6',
-      nombre: 'Convenio de Budapest (2001)',
-      ambito: 'Tratado internacional que estandariza los delitos informáticos.',
-      relevancia: 'Chile se adhirió en 2023 (no en 2018). Hubiera sido el marco de cooperación internacional para investigar el ataque.',
-    },
-    {
-      num: '7',
-      nombre: 'SWIFT Customer Security Programme (CSP)',
-      ambito: 'Controles de seguridad obligatorios para todos los usuarios de la red SWIFT.',
-      relevancia: 'El ataque explotó credenciales SWIFT. El banco debía cumplir con autenticación multifactor, monitoreo de transacciones y segregación de redes.',
-    },
-    {
-      num: '8',
-      nombre: 'Basilea III — Comité de Supervisión Bancaria de Basilea',
-      ambito: 'Marco internacional para la gestión del riesgo operacional bancario.',
-      relevancia: 'El riesgo tecnológico es parte del riesgo operacional. El ataque evidenció deficiencias en los modelos de gestión de riesgo del banco.',
-    },
-    {
-      num: '9',
-      nombre: 'ISO/IEC 27001:2013 — Seguridad de la información',
-      ambito: 'Estándar internacional de gestión de seguridad.',
-      relevancia: 'La CMF lo referencia. El ataque mostró ausencias en A.12.6 (gestión de vulnerabilidades) y A.16.1 (gestión de incidentes).',
-    },
-    {
-      num: '10',
-      nombre: 'GDPR — Reglamento General de Protección de Datos (UE, 2018)',
-      ambito: 'Regulación europea de protección de datos.',
-      relevancia: 'Valor comparativo: si el banco operara en la UE, habría enfrentado notificación en 72h y multas de hasta 4% de facturación global. Ilustra la brecha con la Ley 19.628 chilena.',
-    },
-  ]
+  const normasFiltradas = NORMAS.filter((n) => {
+    const pasaTipo   = filtroTipo === 'Todos'   || n.tipo === filtroTipo
+    const pasaEstado = filtroEstado === 'Todos' || n.estado === filtroEstado
+    return pasaTipo && pasaEstado
+  })
 
-  const tabla = [
-    { norma: 'Ley 19.223 (1993)', tipo: 'Nacional — Penal', relevancia: 'Vigente al momento; tipificaba el sabotaje informático' },
-    { norma: 'Ley 21.459 (2022)', tipo: 'Nacional — Penal', relevancia: 'Marco actual para tipificar los delitos del caso' },
-    { norma: 'Ley 19.628 (1999)', tipo: 'Nacional — Civil', relevancia: 'Protección de datos personales de clientes' },
-    { norma: 'DFL N°3 / Ley General de Bancos', tipo: 'Nacional — Regulatorio', relevancia: 'Obligaciones de gestión de riesgo del banco' },
-    { norma: 'Normativa CMF (Circular 3.506+)', tipo: 'Nacional — Regulatorio', relevancia: 'Base de las sanciones administrativas impuestas' },
-    { norma: 'Convenio de Budapest', tipo: 'Internacional', relevancia: 'Marco de cooperación policial y tipificación uniforme' },
-    { norma: 'SWIFT CSP', tipo: 'Internacional — Sectorial', relevancia: 'Controles de seguridad incumplidos en la red SWIFT' },
-    { norma: 'Basilea III', tipo: 'Internacional — Bancario', relevancia: 'Gestión del riesgo operacional tecnológico' },
-    { norma: 'ISO 27001', tipo: 'Internacional — Técnico', relevancia: 'Estándar de referencia de la CMF para seguridad' },
-    { norma: 'GDPR (UE)', tipo: 'Internacional', relevancia: 'Referencia comparativa de protección de datos' },
-  ]
+  const conteoTipo   = (t) => t === 'Todos' ? NORMAS.length : NORMAS.filter((n) => n.tipo === t).length
+  const conteoEstado = (e) => e === 'Todos' ? NORMAS.length : NORMAS.filter((n) => n.estado === e).length
 
   return (
     <motion.div
@@ -154,132 +203,231 @@ export default function Marco() {
         </div>
       </div>
 
-      {/* Nacionales */}
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Normas Nacionales (Chile)</h2>
-        <div className="space-y-4">
-          {nacionales.map((n, i) => (
-            <motion.div
-              key={n.num}
-              custom={i}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.09)' }}
-              className="border border-gray-200 rounded-xl p-5 bg-white"
+      {/* Filtros */}
+      <section className="mb-8 space-y-3">
+        {/* Filtro por tipo */}
+        <div className="flex flex-wrap gap-2">
+          {['Todos', 'Nacional', 'Internacional'].map((t) => (
+            <button
+              key={t}
+              onClick={() => { setFiltroTipo(t); setNormaAbierta(null) }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                filtroTipo === t
+                  ? 'bg-indigo-700 text-white border-indigo-700'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-700'
+              }`}
             >
-              <div className="flex items-start gap-3 mb-2">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center">{n.num}</span>
-                <h3 className="font-semibold text-gray-800">{n.nombre}</h3>
-              </div>
-              <p className="text-sm text-gray-500 mb-1 pl-10"><span className="font-medium text-gray-600">Ámbito:</span> {n.ambito}</p>
-              <p className="text-sm text-gray-600 mb-2 pl-10"><span className="font-medium">Relevancia:</span> {n.relevancia}</p>
-              {n.articulos.length > 0 && (
-                <ul className="pl-10 space-y-1 mb-2">
-                  {n.articulos.map((a) => (
-                    <li key={a} className="text-sm text-blue-700 bg-blue-50 rounded px-3 py-1">{a}</li>
-                  ))}
-                </ul>
-              )}
-              <span className={`ml-10 inline-block text-xs px-2 py-0.5 rounded-full font-medium ${badgeEstado(n.estado)}`}>
-                {n.estado}
+              {t}
+              <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${filtroTipo === t ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                {conteoTipo(t)}
               </span>
-            </motion.div>
+            </button>
           ))}
         </div>
-      </section>
-
-      {/* Internacionales */}
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Normas Internacionales</h2>
-        <div className="space-y-4">
-          {internacionales.map((n, i) => (
-            <motion.div
-              key={n.num}
-              custom={i}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.09)' }}
-              className="border border-gray-200 rounded-xl p-5 bg-white"
+        {/* Filtro por estado */}
+        <div className="flex flex-wrap gap-2">
+          {['Todos', 'Vigente', 'Derogada', 'En reforma', 'Internacional'].map((e) => (
+            <button
+              key={e}
+              onClick={() => { setFiltroEstado(e); setNormaAbierta(null) }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                filtroEstado === e
+                  ? 'bg-gray-800 text-white border-gray-800'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+              }`}
             >
-              <div className="flex items-start gap-3 mb-2">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">{n.num}</span>
-                <h3 className="font-semibold text-gray-800">{n.nombre}</h3>
-              </div>
-              <p className="text-sm text-gray-500 mb-1 pl-10"><span className="font-medium text-gray-600">Ámbito:</span> {n.ambito}</p>
-              <p className="text-sm text-gray-600 pl-10"><span className="font-medium">Relevancia:</span> {n.relevancia}</p>
-            </motion.div>
+              {e}
+              <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${filtroEstado === e ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                {conteoEstado(e)}
+              </span>
+            </button>
           ))}
         </div>
       </section>
 
-      {/* Tabla resumen */}
+      {/* Acordeón de normas */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Resumen de normas aplicables</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="bg-gray-800 text-white">
-                <th className="text-left p-3 rounded-tl-lg">Norma</th>
-                <th className="text-left p-3">Tipo</th>
-                <th className="text-left p-3 rounded-tr-lg">Relevancia al caso</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {tabla.map((row) => (
-                <tr key={row.norma} className="hover:bg-gray-50">
-                  <td className="p-3 font-medium text-gray-800">{row.norma}</td>
-                  <td className="p-3 text-gray-500 whitespace-nowrap">{row.tipo}</td>
-                  <td className="p-3 text-gray-600">{row.relevancia}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h2 className="text-xl font-semibold text-gray-700 mb-1">
+          Normas aplicables
+          {(filtroTipo !== 'Todos' || filtroEstado !== 'Todos') && (
+            <span className="ml-2 text-sm font-normal text-gray-400">— {normasFiltradas.length} resultado{normasFiltradas.length !== 1 ? 's' : ''}</span>
+          )}
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">Haz click en cada norma para ver artículos clave y relevancia al caso.</p>
+
+        <div className="space-y-2">
+          <AnimatePresence>
+            {normasFiltradas.map((n, i) => {
+              const abierta = normaAbierta === n.id
+              return (
+                <motion.div
+                  key={n.id}
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit={{ opacity: 0, height: 0, transition: { duration: 0.15 } }}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                >
+                  <button
+                    onClick={() => setNormaAbierta(abierta ? null : n.id)}
+                    className="w-full text-left px-5 py-3.5 flex items-center gap-3 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className={`shrink-0 w-7 h-7 rounded-full text-white text-xs font-bold flex items-center justify-center ${n.tipo === 'Nacional' ? 'bg-blue-900' : 'bg-indigo-600'}`}>
+                      {n.num}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-gray-800 text-sm">{n.nombre}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_BADGE[n.estado]}`}>
+                          {n.estadoTexto}
+                        </span>
+                      </div>
+                      {!abierta && <p className="text-xs text-gray-500 mt-0.5 truncate">{n.ambito}</p>}
+                    </div>
+                    <motion.span
+                      animate={{ rotate: abierta ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-gray-400 text-xs shrink-0"
+                    >▼</motion.span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {abierta && (
+                      <motion.div
+                        key="body"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <div className="px-5 pb-4 pt-2 border-t border-gray-100 space-y-3">
+                          <div>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Ámbito</p>
+                            <p className="text-sm text-gray-600">{n.ambito}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Relevancia al caso</p>
+                            <p className="text-sm text-indigo-800 bg-indigo-50 rounded-lg px-3 py-2">{n.relevancia}</p>
+                          </div>
+                          {n.articulos.length > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Artículos clave</p>
+                              <ul className="space-y-1">
+                                {n.articulos.map((a) => (
+                                  <li key={a} className="text-sm text-blue-700 bg-blue-50 rounded px-3 py-1">{a}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
+
+          {normasFiltradas.length === 0 && (
+            <div className="text-center py-8 text-gray-400 text-sm">
+              Sin normas para los filtros seleccionados.{' '}
+              <button onClick={() => { setFiltroTipo('Todos'); setFiltroEstado('Todos') }} className="text-indigo-500 hover:underline">Limpiar filtros</button>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Mapa de cobertura normativa */}
+      {/* Mapa de cobertura interactivo */}
       <section>
         <h2 className="text-xl font-semibold text-gray-700 mb-1">Mapa de cobertura normativa</h2>
-        <p className="text-sm text-gray-500 mb-4">¿Qué dimensión del incidente aborda cada norma?</p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
+        <p className="text-sm text-gray-500 mb-4">
+          Click en una <strong>norma</strong> para resaltar su fila · Click en una <strong>dimensión</strong> para resaltar su columna
+        </p>
+
+        <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+          <table className="w-full text-sm border-collapse min-w-[520px]">
             <thead>
               <tr className="bg-gray-800 text-white">
-                <th className="text-left p-3 rounded-tl-lg">Norma</th>
-                {DIMENSIONES.map((d) => (
-                  <th key={d} className="p-3 text-center text-xs">{d}</th>
-                ))}
+                <th className="text-left p-3 rounded-tl-xl">Norma</th>
+                {DIMENSIONES.map((d, di) => {
+                  const activa = dimDestacada === d
+                  return (
+                    <th
+                      key={d}
+                      onClick={() => setDimDestacada(activa ? null : d)}
+                      className={`p-3 text-center text-xs cursor-pointer transition-colors select-none ${activa ? 'bg-indigo-600' : 'hover:bg-gray-700'} ${di === DIMENSIONES.length - 1 ? 'rounded-tr-xl' : ''}`}
+                    >
+                      {d}
+                      {activa && <span className="block text-indigo-200 text-xs">▲</span>}
+                    </th>
+                  )
+                })}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {COBERTURA.map((row) => (
-                <tr key={row.norma} className="hover:bg-gray-50">
-                  <td className="p-3 font-medium text-gray-700 whitespace-nowrap">{row.norma}</td>
-                  {row.valores.map((v, i) => (
-                    <td key={i} className="p-3 text-center">
-                      <span
-                        className={`inline-block w-4 h-4 rounded-full ${COB_COLOR[v]}`}
-                        title={COB_LABEL[v]}
-                      />
+              {COBERTURA.map((row) => {
+                const filaActiva = normaDestacada === row.norma
+                return (
+                  <tr
+                    key={row.norma}
+                    onClick={() => setNormaDestacada(filaActiva ? null : row.norma)}
+                    className={`cursor-pointer transition-colors ${filaActiva ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}
+                  >
+                    <td className={`p-3 font-medium whitespace-nowrap text-sm transition-colors ${filaActiva ? 'text-indigo-800' : 'text-gray-700'}`}>
+                      {filaActiva && <span className="mr-1 text-indigo-500">→</span>}
+                      {row.norma}
                     </td>
-                  ))}
-                </tr>
-              ))}
+                    {row.valores.map((v, i) => {
+                      const colActiva = dimDestacada === DIMENSIONES[i]
+                      return (
+                        <td
+                          key={i}
+                          className={`p-3 text-center transition-colors ${(filaActiva || colActiva) && v !== 'none' ? 'bg-indigo-100' : ''}`}
+                        >
+                          <span
+                            className={`inline-block w-4 h-4 rounded-full transition-all ${COB_COLOR[v]} ${(filaActiva || colActiva) ? 'ring-2 ring-offset-1 ring-indigo-400' : ''}`}
+                            title={COB_LABEL[v]}
+                          />
+                        </td>
+                      )
+                    })}
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
+
+        {/* Panel de detalle al seleccionar norma o dimensión */}
+        <AnimatePresence mode="wait">
+          {(normaDestacada || dimDestacada) && (
+            <motion.div
+              key={`${normaDestacada}-${dimDestacada}`}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18 }}
+              className="mt-3 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-sm text-indigo-900 flex items-start gap-3"
+            >
+              <span className="text-indigo-500 font-semibold shrink-0">
+                {normaDestacada ? `Norma →` : `Dimensión →`}
+              </span>
+              <span>
+                {normaDestacada
+                  ? NORMAS.find((n) => n.norma === normaDestacada || n.nombre.startsWith(normaDestacada.split('/')[0].trim()))?.relevancia ?? `${normaDestacada} — ver artículos en el acordeón.`
+                  : `${dimDestacada}: normas con cobertura directa (verde) o parcial (amarillo) en esta dimensión para el caso Banco de Chile.`
+                }
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="flex flex-wrap gap-4 mt-3 text-xs text-gray-500">
-          <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Cubre directamente
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" /> Cubre parcialmente
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-gray-200 border border-gray-300 inline-block" /> No aplica
-          </span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Cubre directamente</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" /> Cubre parcialmente</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-200 border border-gray-300 inline-block" /> No aplica</span>
         </div>
       </section>
     </motion.div>
