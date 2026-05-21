@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 /* ─── Contador animado ──────────────────────────────────────────── */
 function AnimatedCounter({ target, prefix = '', sufijo = '', duracion = 1200 }) {
@@ -116,24 +116,155 @@ const KPIS = [
   { target: 2, prefix: '', sufijo: '', label: 'Vectores',  sub: 'KillMBR y SWIFT simultáneos',                   bg: 'bg-blue-900',   light: 'text-blue-200' },
 ]
 
+/* ─── Datos extendidos para timeline ────────────────────────────── */
+const TIMELINE = [
+  {
+    date: 'Semanas antes',
+    event: 'Infiltración inicial a la red interna del banco (posiblemente via phishing o vulnerabilidad).',
+    sistema: 'Active Directory / servidores internos',
+    tecnica: 'Spear-phishing o explotación de vulnerabilidad; establecimiento de acceso persistente (APT).',
+    consecuencia: 'Los atacantes obtuvieron un punto de apoyo silencioso desde el cual mapear la red y recopilar credenciales SWIFT.',
+  },
+  {
+    date: '24 mayo 2018 — Mañana',
+    event: 'Activación simultánea del malware KillMBR en ~9.000 equipos. Colapso operativo masivo.',
+    sistema: '~9.000 estaciones de trabajo del banco',
+    tecnica: 'KillMBR sobrescribe el Master Boot Record; los equipos quedan completamente inoperativos al reiniciar.',
+    consecuencia: 'Colapso operativo masivo. El banco destina todos sus recursos humanos y técnicos a responder al incidente visible, lo que es exactamente lo que los atacantes buscaban.',
+  },
+  {
+    date: '24 mayo — Durante la crisis',
+    event: 'Ejecución de transferencias SWIFT fraudulentas hacia cuentas en Hong Kong y Madrid.',
+    sistema: 'Plataforma SWIFT del banco',
+    tecnica: 'Uso de credenciales SWIFT legítimas robadas previamente. Los mensajes SWIFT enviados eran técnicamente auténticos.',
+    consecuencia: 'USD 10 millones transferidos. El caos del KillMBR impidió la detección oportuna.',
+  },
+  {
+    date: '24–25 mayo 2018',
+    event: 'Banco detecta las transferencias. Coordinación con bancos corresponsales para bloquear fondos.',
+    sistema: 'Sistemas de monitoreo y comunicación interbancaria',
+    tecnica: 'Análisis forense de urgencia e intercepción coordinada con corresponsales en el exterior.',
+    consecuencia: 'Recuperación parcial estimada en ~USD 4M. Aproximadamente USD 6M no fueron restituidos.',
+  },
+  {
+    date: 'Semanas siguientes',
+    event: 'CMF inicia investigación formal. Empresas de ciberseguridad analizan el malware.',
+    sistema: 'Organismos regulatorios y firmas forenses',
+    tecnica: 'Análisis de muestra del malware KillMBR, revisión de logs y vectores de entrada.',
+    consecuencia: 'Atribución informal al Grupo Lazarus (Corea del Norte). Ninguna acusación formal fue presentada.',
+  },
+  {
+    date: '2018–2019',
+    event: 'CMF impone multas y exige mejoras en controles de ciberseguridad. Atribución informal al Grupo Lazarus.',
+    sistema: 'Proceso regulatorio CMF',
+    tecnica: 'Auditoría de cumplimiento SWIFT CSP y Circular CMF N°3.506.',
+    consecuencia: 'El banco invirtió decenas de millones en modernización tecnológica. El caso impulsó reformas regulatorias en ciberseguridad financiera en Chile.',
+  },
+]
+
+/* ─── Datos extendidos para impactos (tabs) ─────────────────────── */
+const IMPACTOS = [
+  {
+    tipo: 'Financiero',
+    desc: 'USD 10 millones transferidos fraudulentamente (~USD 6M no recuperados)',
+    color: 'bg-red-100 border-red-400 text-red-800',
+    tabColor: 'bg-red-700 text-white',
+    tabInactivo: 'bg-white text-red-700 border border-red-300 hover:bg-red-50',
+    detalle: [
+      'USD 10M transferidos vía SWIFT hacia cuentas en Hong Kong y Madrid.',
+      '~USD 6M no fueron recuperados ni restituidos al banco.',
+      'Costos adicionales: recuperación tecnológica, consultores forenses, honorarios legales y comunicaciones de crisis.',
+      'Impacto en el precio de la acción en bolsa chilena.',
+    ],
+  },
+  {
+    tipo: 'Operacional',
+    desc: '~9.000 equipos inutilizados; suspensión parcial de servicios por días',
+    color: 'bg-orange-100 border-orange-400 text-orange-800',
+    tabColor: 'bg-orange-600 text-white',
+    tabInactivo: 'bg-white text-orange-700 border border-orange-300 hover:bg-orange-50',
+    detalle: [
+      '~9.000 estaciones de trabajo destruidas por el malware KillMBR.',
+      'Reinstalación o reemplazo masivo de hardware y software en todas las sucursales afectadas.',
+      'Servicios bancarios básicos degradados durante días; algunos servicios digitales suspendidos temporalmente.',
+      'Operación completa con personal reducido mientras se recuperaba la infraestructura.',
+    ],
+  },
+  {
+    tipo: 'Reputacional',
+    desc: 'Cobertura mediática masiva; desconfianza de clientes y accionistas',
+    color: 'bg-yellow-100 border-yellow-400 text-yellow-800',
+    tabColor: 'bg-yellow-600 text-white',
+    tabInactivo: 'bg-white text-yellow-700 border border-yellow-300 hover:bg-yellow-50',
+    detalle: [
+      'Cobertura mediática masiva en Chile, Latinoamérica y medios financieros internacionales.',
+      'Desconfianza de clientes, particularmente corporativos e institucionales, respecto a la seguridad del banco.',
+      'Comunicaciones públicas de crisis por parte de la gerencia y el directorio.',
+      'Atribución informal a Grupo Lazarus elevó el perfil internacional del incidente, amplificando el daño reputacional.',
+    ],
+  },
+  {
+    tipo: 'Regulatorio',
+    desc: 'Investigación y multa de la CMF; exigencia de mejoras en ciberseguridad',
+    color: 'bg-blue-100 border-blue-400 text-blue-800',
+    tabColor: 'bg-blue-700 text-white',
+    tabInactivo: 'bg-white text-blue-700 border border-blue-300 hover:bg-blue-50',
+    detalle: [
+      'Investigación formal y multa impuesta por la CMF (ex-SBIF).',
+      'Exigencia de cumplimiento total del Customer Security Programme (CSP) de SWIFT.',
+      'Plan obligatorio de mejoras en controles de ciberseguridad bajo Circular CMF N°3.506.',
+      'El caso fue uno de los detonantes del proceso de actualización del marco regulatorio de ciberseguridad financiera en Chile.',
+    ],
+  },
+  {
+    tipo: 'Datos personales',
+    desc: 'Posible exposición de datos de clientes en sistemas comprometidos',
+    color: 'bg-purple-100 border-purple-400 text-purple-800',
+    tabColor: 'bg-purple-700 text-white',
+    tabInactivo: 'bg-white text-purple-700 border border-purple-300 hover:bg-purple-50',
+    detalle: [
+      'Datos de empleados del banco comprometidos vía Active Directory (RUT, cargos, credenciales).',
+      'Datos de clientes en estaciones de trabajo del área bancaria potencialmente expuestos.',
+      'Datos de transferencias internacionales SWIFT accedidos por los atacantes.',
+      'La Ley 19.628 no exigía notificación a los titulares en 2018; la mayoría de clientes no supo si sus datos fueron comprometidos.',
+    ],
+  },
+]
+
+/* ─── Datos extendidos para actores ─────────────────────────────── */
+const ACTORES_TABLE = [
+  {
+    actor: 'Atacantes (Grupo Lazarus)',
+    rol: 'Autores del ataque; ejecutaron el KillMBR y las transferencias SWIFT',
+    detalle: 'Presuntamente vinculados al gobierno de Corea del Norte. Nunca identificados judicialmente. Usaron técnicas APT avanzadas: spear-phishing, movimiento lateral, uso de credenciales legítimas. La atribución al Grupo Lazarus fue realizada por firmas privadas (Trend Micro, BAE Systems) pero no fue establecida formalmente por ningún organismo judicial.',
+  },
+  {
+    actor: 'Banco de Chile',
+    rol: 'Víctima principal; responsable de proteger activos y datos de clientes',
+    detalle: 'Entidad financiera más grande de Chile al momento del ataque. Tenía implementados controles de seguridad básicos pero no cumplía plenamente con el SWIFT CSP. El ataque evidenció deficiencias en la detección de amenazas persistentes avanzadas (APT) y en la segmentación de redes internas.',
+  },
+  {
+    actor: 'Red SWIFT',
+    rol: 'Canal financiero internacional utilizado para las transferencias fraudulentas',
+    detalle: 'SWIFT no fue hackeada directamente; los atacantes usaron credenciales legítimas del banco para enviar mensajes SWIFT auténticos. Post-incidente, SWIFT aceleró la implementación obligatoria del CSP para todos los miembros y reforzó sus controles de monitoreo.',
+  },
+  {
+    actor: 'Bancos corresponsales',
+    rol: 'Receptores intermediarios en Hong Kong y Madrid',
+    detalle: 'Los fondos fueron transferidos a cuentas en instituciones de Hong Kong y Madrid. La coordinación internacional permitió bloquear parte de los fondos. Los corresponsales actuaron de buena fe al recibir mensajes SWIFT que parecían legítimos.',
+  },
+  {
+    actor: 'CMF (ex-SBIF)',
+    rol: 'Organismo regulador; investigó y sancionó al banco',
+    detalle: 'La Comisión para el Mercado Financiero (que sucedió a la SBIF) inició una investigación formal, impuso multas al banco y exigió un plan obligatorio de mejoras en ciberseguridad. El caso fue determinante para la posterior actualización de la Circular N°3.506 sobre riesgo tecnológico en entidades financieras.',
+  },
+]
+
 /* ═══════════════════════════════════════════════════════════════ */
 export default function Resumen() {
-  const timeline = [
-    { date: 'Semanas antes',          event: 'Infiltración inicial a la red interna del banco (posiblemente via phishing o vulnerabilidad).' },
-    { date: '24 mayo 2018 — Mañana',  event: 'Activación simultánea del malware KillMBR en ~9.000 equipos. Colapso operativo masivo.' },
-    { date: '24 mayo — Durante crisis',event: 'Ejecución de transferencias SWIFT fraudulentas hacia cuentas en Hong Kong y Madrid.' },
-    { date: '24–25 mayo 2018',         event: 'Banco detecta las transferencias. Coordinación con bancos corresponsales para bloquear fondos.' },
-    { date: 'Semanas siguientes',      event: 'CMF inicia investigación formal. Empresas de ciberseguridad analizan el malware.' },
-    { date: '2018–2019',               event: 'CMF impone multas y exige mejoras en controles de ciberseguridad. Atribución informal al Grupo Lazarus.' },
-  ]
-
-  const impactos = [
-    { tipo: 'Financiero',      desc: 'USD 10 millones transferidos fraudulentamente (~USD 6M no recuperados)', color: 'bg-red-100 border-red-400 text-red-800' },
-    { tipo: 'Operacional',     desc: '~9.000 equipos inutilizados; suspensión parcial de servicios por días',   color: 'bg-orange-100 border-orange-400 text-orange-800' },
-    { tipo: 'Reputacional',    desc: 'Cobertura mediática masiva; desconfianza de clientes y accionistas',       color: 'bg-yellow-100 border-yellow-400 text-yellow-800' },
-    { tipo: 'Regulatorio',     desc: 'Investigación y multa de la CMF; exigencia de mejoras en ciberseguridad', color: 'bg-blue-100 border-blue-400 text-blue-800' },
-    { tipo: 'Datos personales',desc: 'Posible exposición de datos de clientes en sistemas comprometidos',        color: 'bg-purple-100 border-purple-400 text-purple-800' },
-  ]
+  const [pasoAbierto, setPasoAbierto]   = useState(null)
+  const [tabImpacto, setTabImpacto]     = useState('Financiero')
+  const [actorAbierto, setActorAbierto] = useState(null)
 
   return (
     <motion.div
@@ -289,74 +420,166 @@ export default function Resumen() {
         </p>
       </section>
 
-      {/* ── Impactos ── */}
+      {/* ── Impactos (tabs) ── */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Impacto del incidente</h2>
-        <div className="space-y-3">
-          {impactos.map((item, i) => (
-            <motion.div
-              key={item.tipo}
-              custom={i}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              whileHover={{ x: 4 }}
-              className={`border-l-4 rounded-r-lg p-4 flex items-start gap-3 ${item.color}`}
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {IMPACTOS.map((imp) => (
+            <button
+              key={imp.tipo}
+              onClick={() => setTabImpacto(imp.tipo)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                tabImpacto === imp.tipo ? imp.tabColor : imp.tabInactivo
+              }`}
             >
-              {ICONOS_IMPACTO[item.tipo]}
-              <span><span className="font-semibold">{item.tipo}:</span> {item.desc}</span>
-            </motion.div>
+              {ICONOS_IMPACTO[imp.tipo]}
+              {imp.tipo}
+            </button>
           ))}
         </div>
+        {/* Contenido de la tab activa */}
+        <AnimatePresence mode="wait">
+          {IMPACTOS.filter((i) => i.tipo === tabImpacto).map((imp) => (
+            <motion.div
+              key={imp.tipo}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className={`border-l-4 rounded-r-xl p-5 ${imp.color}`}
+            >
+              <p className="font-semibold mb-3">{imp.tipo}: {imp.desc}</p>
+              <ul className="space-y-2">
+                {imp.detalle.map((d, i) => (
+                  <li key={i} className="flex gap-2 text-sm">
+                    <span className="shrink-0 mt-0.5">·</span>
+                    {d}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </section>
 
-      {/* ── Línea de tiempo ── */}
+      {/* ── Línea de tiempo (acordeón) ── */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Línea de tiempo</h2>
-        <div className="relative border-l-2 border-gray-300 pl-6 space-y-6">
-          {timeline.map((item, idx) => (
-            <motion.div
-              key={idx}
-              custom={idx}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              className="relative"
-            >
-              <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-blue-600 border-2 border-white" />
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{item.date}</p>
-              <p className="text-gray-700 mt-1">{item.event}</p>
-            </motion.div>
-          ))}
+        <h2 className="text-xl font-semibold text-gray-700 mb-1">Línea de tiempo</h2>
+        <p className="text-sm text-gray-500 mb-4">Haz click en cada evento para ver el sistema afectado, la técnica y la consecuencia.</p>
+        <div className="relative border-l-2 border-gray-300 pl-6 space-y-3">
+          {TIMELINE.map((item, idx) => {
+            const abierto = pasoAbierto === idx
+            return (
+              <motion.div
+                key={idx}
+                custom={idx}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                className="relative"
+              >
+                <div className={`absolute -left-[31px] top-3 w-4 h-4 rounded-full border-2 border-white transition-colors ${abierto ? 'bg-blue-700' : 'bg-blue-400'}`} />
+                <button
+                  onClick={() => setPasoAbierto(abierto ? null : idx)}
+                  className={`w-full text-left rounded-xl px-4 py-3 transition-colors ${abierto ? 'bg-blue-50 border border-blue-200' : 'bg-white border border-gray-200 hover:bg-gray-50'}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{item.date}</p>
+                      <p className="text-gray-700 mt-0.5 text-sm">{item.event}</p>
+                    </div>
+                    <motion.span
+                      animate={{ rotate: abierto ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-gray-400 text-xs shrink-0"
+                    >▼</motion.span>
+                  </div>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {abierto && (
+                    <motion.div
+                      key="timeline-body"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.22 }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div className="bg-blue-50 border border-t-0 border-blue-200 rounded-b-xl px-4 py-3 grid sm:grid-cols-3 gap-3">
+                        <div>
+                          <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Sistema afectado</p>
+                          <p className="text-xs text-gray-700">{item.sistema}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Técnica usada</p>
+                          <p className="text-xs text-gray-700">{item.tecnica}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Consecuencia</p>
+                          <p className="text-xs text-gray-700">{item.consecuencia}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )
+          })}
         </div>
       </section>
 
-      {/* ── Actores ── */}
+      {/* ── Actores (cards expandibles) ── */}
       <section>
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Actores involucrados</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="bg-gray-800 text-white">
-                <th className="text-left p-3 rounded-tl-lg">Actor</th>
-                <th className="text-left p-3 rounded-tr-lg">Rol en el incidente</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {[
-                ['Atacantes (Grupo Lazarus)', 'Autores del ataque; ejecutaron el KillMBR y las transferencias SWIFT'],
-                ['Banco de Chile', 'Víctima principal; responsable de la protección de activos y datos de clientes'],
-                ['Red SWIFT', 'Canal financiero internacional utilizado para las transferencias fraudulentas'],
-                ['Bancos corresponsales', 'Receptores intermediarios en Hong Kong y Madrid'],
-                ['CMF (ex-SBIF)', 'Organismo regulador; investigó y sancionó al banco'],
-              ].map(([actor, rol]) => (
-                <tr key={actor} className="hover:bg-gray-50">
-                  <td className="p-3 font-medium text-gray-800">{actor}</td>
-                  <td className="p-3 text-gray-600">{rol}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h2 className="text-xl font-semibold text-gray-700 mb-1">Actores involucrados</h2>
+        <p className="text-sm text-gray-500 mb-4">Haz click para ver el detalle del rol de cada actor en el incidente.</p>
+        <div className="space-y-2">
+          {ACTORES_TABLE.map((item, i) => {
+            const abierto = actorAbierto === i
+            return (
+              <motion.div
+                key={item.actor}
+                custom={i}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+              >
+                <button
+                  onClick={() => setActorAbierto(abierto ? null : i)}
+                  className="w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-gray-50 transition-colors"
+                >
+                  <div>
+                    <p className="font-semibold text-gray-800 text-sm">{item.actor}</p>
+                    <p className="text-xs text-gray-500">{item.rol}</p>
+                  </div>
+                  <motion.span
+                    animate={{ rotate: abierto ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-gray-400 text-xs shrink-0"
+                  >▼</motion.span>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {abierto && (
+                    <motion.div
+                      key="actor-body"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.22 }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div className="px-4 pb-4 pt-2 border-t border-gray-100 bg-gray-50">
+                        <p className="text-sm text-gray-600">{item.detalle}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )
+          })}
         </div>
       </section>
     </motion.div>
