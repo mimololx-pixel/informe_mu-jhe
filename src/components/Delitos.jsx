@@ -186,6 +186,7 @@ export default function Delitos() {
   const [filtro, setFiltro] = useState('Todos')
   const [escenarioAbierto, setEscenarioAbierto] = useState(false)
   const [busqueda, setBusqueda] = useState('')
+  const [hoveredBar, setHoveredBar] = useState(null)
 
   const conteoCategoria = (cat) =>
     cat === 'Todos' ? DELITOS.length : DELITOS.filter((d) => d.categoria === cat).length
@@ -442,34 +443,60 @@ export default function Delitos() {
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Comparativa visual de penas</h2>
         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-          {GRAFICO_PENAS.map((item, i) => (
-            <div key={item.id} className="flex items-center gap-3">
-              <div className="w-24 shrink-0">
-                <p className="text-xs font-semibold text-gray-700">{item.label}</p>
-                <p className="text-xs text-gray-400 truncate">{item.titulo}</p>
-              </div>
-              <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden flex">
-                <motion.div
-                  className={`h-full ${item.color}`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(item.anos / MAX_ANOS) * 100}%` }}
-                  transition={{ duration: 0.6, delay: i * 0.1, ease: 'easeOut' }}
-                />
-                {item.anosAg && (
+          {GRAFICO_PENAS.map((item, i) => {
+            const isHovered = hoveredBar === item.id
+            const delitoInfo = DELITOS.find((d) => d.id === item.id)
+            return (
+              <div
+                key={item.id}
+                className={`flex items-center gap-3 rounded-lg px-2 py-1 -mx-2 transition-colors ${isHovered ? 'bg-gray-50' : ''}`}
+                onMouseEnter={() => setHoveredBar(item.id)}
+                onMouseLeave={() => setHoveredBar(null)}
+              >
+                <div className="w-24 shrink-0">
+                  <p className="text-xs font-semibold text-gray-700">{item.label}</p>
+                  <p className="text-xs text-gray-400 truncate">{item.titulo}</p>
+                </div>
+                <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden flex">
                   <motion.div
-                    className="h-full bg-red-200"
+                    className={`h-full ${item.color}`}
                     initial={{ width: 0 }}
-                    animate={{ width: `${((item.anosAg - item.anos) / MAX_ANOS) * 100}%` }}
-                    transition={{ duration: 0.5, delay: i * 0.1 + 0.5, ease: 'easeOut' }}
+                    animate={{ width: `${(item.anos / MAX_ANOS) * 100}%` }}
+                    transition={{ duration: 0.6, delay: i * 0.1, ease: 'easeOut' }}
                   />
-                )}
+                  {item.anosAg && (
+                    <motion.div
+                      className="h-full bg-red-200"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${((item.anosAg - item.anos) / MAX_ANOS) * 100}%` }}
+                      transition={{ duration: 0.5, delay: i * 0.1 + 0.5, ease: 'easeOut' }}
+                    />
+                  )}
+                </div>
+                <div className="w-28 shrink-0 text-right">
+                  <AnimatePresence mode="wait">
+                    {isHovered && delitoInfo ? (
+                      <motion.p
+                        key="detail"
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="text-xs font-medium text-gray-800 leading-snug"
+                      >
+                        {delitoInfo.penaDetalle}
+                      </motion.p>
+                    ) : (
+                      <motion.div key="normal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}>
+                        <p className="text-xs text-gray-600">hasta {item.anos} años</p>
+                        {item.anosAg && <p className="text-xs text-red-500 font-medium">+ Art.10: {item.anosAg} años</p>}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
-              <div className="w-28 shrink-0 text-right">
-                <p className="text-xs text-gray-600">hasta {item.anos} años</p>
-                {item.anosAg && <p className="text-xs text-red-500 font-medium">+ Art.10: {item.anosAg} años</p>}
-              </div>
-            </div>
-          ))}
+            )
+          })}
           <div className="flex flex-wrap gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
             <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block" /> Acceso / Abuso</span>
             <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> Integridad</span>

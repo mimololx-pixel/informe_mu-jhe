@@ -224,11 +224,11 @@ const ACTORES = [
 ]
 
 const RESUMEN = [
-  { actor: 'Atacantes (Lazarus)',  penal: 'Alta',  civil: 'Alta',       adm: 'N/A'    },
-  { actor: 'Banco de Chile',       penal: 'Baja',  civil: 'Media-Alta', adm: 'Alta'   },
-  { actor: 'Directivos del banco', penal: 'Baja',  civil: 'Media',      adm: 'Media'  },
-  { actor: 'SWIFT',                penal: 'N/A',   civil: 'N/A',        adm: 'Propia' },
-  { actor: 'CMF',                  penal: 'N/A',   civil: 'N/A',        adm: 'N/A'    },
+  { actor: 'Atacantes (Lazarus)',  penal: 'Alta',  civil: 'Alta',       adm: 'N/A',    norma: 'Arts. 2, 3, 4, 6, 8 y 10 — Ley 21.459' },
+  { actor: 'Banco de Chile',       penal: 'Baja',  civil: 'Media-Alta', adm: 'Alta',   norma: 'Circular CMF N°3.506 + Art. 23 Ley 19.628' },
+  { actor: 'Directivos del banco', penal: 'Baja',  civil: 'Media',      adm: 'Media',  norma: 'Art. 133 LSA + Arts. 39 y ss. LGB' },
+  { actor: 'SWIFT',                penal: 'N/A',   civil: 'N/A',        adm: 'Propia', norma: 'SWIFT CSP — auditoría interna' },
+  { actor: 'CMF',                  penal: 'N/A',   civil: 'N/A',        adm: 'N/A',    norma: 'Actúa como sancionador, no como responsable' },
 ]
 
 function NivelBadge({ nivel }) {
@@ -268,10 +268,11 @@ function TablaDetail({ filas, headerClass }) {
 
 /* ═══════════════════════════════════════════════════════════════ */
 export default function Responsabilidades() {
-  const [actorAbierto, setActorAbierto] = useState(null)
-  const [notaAbierta,  setNotaAbierta]  = useState(false)
-  const [hoveredCell,  setHoveredCell]  = useState(null)
-  const [filtroTipo,   setFiltroTipo]   = useState('Todos')
+  const [actorAbierto, setActorAbierto]   = useState(null)
+  const [notaAbierta,  setNotaAbierta]    = useState(false)
+  const [hoveredCell,  setHoveredCell]    = useState(null)
+  const [filtroTipo,   setFiltroTipo]     = useState('Todos')
+  const [hoveredResumen, setHoveredResumen] = useState(null)
 
   return (
     <motion.div
@@ -573,8 +574,27 @@ export default function Responsabilidades() {
                   initial="hidden"
                   animate="visible"
                   className="hover:bg-gray-50"
+                  onMouseEnter={() => setHoveredResumen(i)}
+                  onMouseLeave={() => setHoveredResumen(null)}
                 >
-                  <td className="p-3 font-medium text-gray-700 bg-gray-50">{fila.actor}</td>
+                  <td className="p-3 font-medium text-gray-700 bg-gray-50">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {fila.actor}
+                      <AnimatePresence>
+                        {hoveredResumen === i && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -6 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -6 }}
+                            transition={{ duration: 0.18 }}
+                            className="text-xs bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full font-mono"
+                          >
+                            {fila.norma}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </td>
                   {[fila.penal, fila.civil, fila.adm].map((nivel, ni) => (
                     <td key={ni} className="p-3 text-center">
                       <NivelBadge nivel={nivel} />

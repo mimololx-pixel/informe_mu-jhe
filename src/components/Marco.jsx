@@ -343,7 +343,7 @@ export default function Marco() {
       <section>
         <h2 className="text-xl font-semibold text-gray-700 mb-1">Mapa de cobertura normativa</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Click en una <strong>norma</strong> para resaltar su fila · Click en una <strong>dimensión</strong> para resaltar su columna
+          Pasa el mouse sobre una <strong>norma</strong> para resaltar su fila · sobre una <strong>dimensión</strong> para resaltar su columna
         </p>
 
         <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
@@ -356,8 +356,9 @@ export default function Marco() {
                   return (
                     <th
                       key={d}
-                      onClick={() => setDimDestacada(activa ? null : d)}
-                      className={`p-3 text-center text-xs cursor-pointer transition-colors select-none ${activa ? 'bg-indigo-600' : 'hover:bg-gray-700'} ${di === DIMENSIONES.length - 1 ? 'rounded-tr-xl' : ''}`}
+                      onMouseEnter={() => setDimDestacada(d)}
+                      onMouseLeave={() => setDimDestacada(null)}
+                      className={`p-3 text-center text-xs cursor-default transition-colors select-none ${activa ? 'bg-indigo-600' : 'hover:bg-gray-700'} ${di === DIMENSIONES.length - 1 ? 'rounded-tr-xl' : ''}`}
                     >
                       {d}
                       {activa && <span className="block text-indigo-200 text-xs">▲</span>}
@@ -372,8 +373,9 @@ export default function Marco() {
                 return (
                   <tr
                     key={row.norma}
-                    onClick={() => setNormaDestacada(filaActiva ? null : row.norma)}
-                    className={`cursor-pointer transition-colors ${filaActiva ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}
+                    onMouseEnter={() => setNormaDestacada(row.norma)}
+                    onMouseLeave={() => setNormaDestacada(null)}
+                    className={`cursor-default transition-colors ${filaActiva ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}
                   >
                     <td className={`p-3 font-medium whitespace-nowrap text-sm transition-colors ${filaActiva ? 'text-indigo-800' : 'text-gray-700'}`}>
                       {filaActiva && <span className="mr-1 text-indigo-500">→</span>}

@@ -110,10 +110,10 @@ const ICONOS_IMPACTO = {
 
 /* ─── Datos KPIs ────────────────────────────────────────────────── */
 const KPIS = [
-  { target: 10, prefix: 'USD $', sufijo: 'M', label: 'Pérdida total', sub: 'monto transferido fraudulentamente', bg: 'bg-red-900', light: 'text-red-300' },
-  { target: 6,  prefix: 'USD $', sufijo: 'M', label: 'Sin recuperar', sub: 'fondos no restituidos al banco',      bg: 'bg-red-700', light: 'text-red-200' },
-  { target: 9000, prefix: '~', sufijo: '', label: 'Equipos', sub: 'destruidos por KillMBR',                      bg: 'bg-orange-800', light: 'text-orange-200' },
-  { target: 2, prefix: '', sufijo: '', label: 'Vectores',  sub: 'KillMBR y SWIFT simultáneos',                   bg: 'bg-blue-900',   light: 'text-blue-200' },
+  { target: 10, prefix: 'USD $', sufijo: 'M', label: 'Pérdida total', sub: 'monto transferido fraudulentamente', detail: 'Transferidos a cuentas en Hong Kong y Madrid vía mensajes SWIFT auténticos', bg: 'bg-red-900', light: 'text-red-300' },
+  { target: 6,  prefix: 'USD $', sufijo: 'M', label: 'Sin recuperar', sub: 'fondos no restituidos al banco',      detail: '~USD 4M fueron bloqueados; USD 6M salieron definitivamente del sistema financiero', bg: 'bg-red-700', light: 'text-red-200' },
+  { target: 9000, prefix: '~', sufijo: '', label: 'Equipos', sub: 'destruidos por KillMBR',                      detail: 'Estaciones de trabajo con MBR sobrescrito; colapso operativo en todas las sucursales', bg: 'bg-orange-800', light: 'text-orange-200' },
+  { target: 2, prefix: '', sufijo: '', label: 'Vectores',  sub: 'KillMBR y SWIFT simultáneos',                   detail: 'KillMBR actuó como distractor para encubrir las transferencias SWIFT en tiempo real', bg: 'bg-blue-900',   light: 'text-blue-200' },
 ]
 
 /* ─── Datos extendidos para timeline ────────────────────────────── */
@@ -265,6 +265,7 @@ export default function Resumen() {
   const [pasoAbierto, setPasoAbierto]   = useState(null)
   const [tabImpacto, setTabImpacto]     = useState('Financiero')
   const [actorAbierto, setActorAbierto] = useState(null)
+  const [hoveredKpi, setHoveredKpi]     = useState(null)
 
   return (
     <motion.div
@@ -302,13 +303,39 @@ export default function Resumen() {
             initial="hidden"
             animate="visible"
             whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.25)' }}
+            onMouseEnter={() => setHoveredKpi(i)}
+            onMouseLeave={() => setHoveredKpi(null)}
             className={`${k.bg} text-white rounded-xl p-5 cursor-default`}
           >
             <p className={`text-3xl font-bold mb-1 ${k.light}`}>
               <AnimatedCounter target={k.target} prefix={k.prefix} sufijo={k.sufijo} duracion={1200} />
             </p>
             <p className="text-sm font-semibold">{k.label}</p>
-            <p className={`text-xs mt-0.5 ${k.light} opacity-80`}>{k.sub}</p>
+            <AnimatePresence mode="wait">
+              {hoveredKpi === i ? (
+                <motion.p
+                  key="detail"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.18 }}
+                  className={`text-xs mt-0.5 ${k.light} leading-snug`}
+                >
+                  {k.detail}
+                </motion.p>
+              ) : (
+                <motion.p
+                  key="sub"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.8 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  className={`text-xs mt-0.5 ${k.light}`}
+                >
+                  {k.sub}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </motion.div>
         ))}
       </div>

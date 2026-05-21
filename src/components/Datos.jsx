@@ -495,7 +495,7 @@ export default function Datos() {
           <div className="px-5 py-3 text-white text-sm font-semibold" style={{ background: 'linear-gradient(90deg, #3730a3, #7c3aed)' }}>
             Comparación: Ley 19.628 (Chile 2018) vs. GDPR (UE 2018)
           </div>
-          <p className="px-4 pt-2 pb-1 text-xs text-gray-400">Haz click en una fila para ver el impacto concreto en el caso Banco de Chile</p>
+          <p className="px-4 pt-2 pb-1 text-xs text-gray-400">Pasa el mouse sobre una fila para ver el impacto concreto en el caso Banco de Chile</p>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
@@ -511,8 +511,9 @@ export default function Datos() {
                   return (
                     <tr
                       key={i}
-                      onClick={() => setFilaGdpr(seleccionada ? null : i)}
-                      className={`cursor-pointer transition-colors ${seleccionada ? 'bg-indigo-50' : i % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50/60 hover:bg-gray-100'}`}
+                      onMouseEnter={() => setFilaGdpr(i)}
+                      onMouseLeave={() => setFilaGdpr(null)}
+                      className={`cursor-default transition-colors ${seleccionada ? 'bg-indigo-50' : i % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50/60 hover:bg-gray-100'}`}
                     >
                       <td className="px-4 py-2.5 font-medium text-gray-700 border-b border-gray-100">
                         <span className="flex items-center gap-1">
@@ -537,7 +538,7 @@ export default function Datos() {
             </table>
           </div>
           {/* Panel de detalle GDPR */}
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             {filaGdpr !== null && (
               <motion.div
                 key={filaGdpr}
