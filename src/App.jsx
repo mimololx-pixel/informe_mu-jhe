@@ -144,7 +144,7 @@ function App() {
       <div className="flex-1 flex flex-col min-h-screen">
 
         {/* Barra top móvil */}
-        <div className="md:hidden bg-gray-900 text-white px-4 py-3 flex items-center justify-between shrink-0">
+        <div className="md:hidden bg-gray-900 text-white px-4 py-3 flex items-center justify-between shrink-0 relative z-10">
           <div>
             <p className="text-xs text-gray-400 leading-none mb-0.5">TI3034 · Banco de Chile</p>
             <p className="text-sm font-bold leading-tight">{seccionActual?.label}</p>
@@ -169,7 +169,7 @@ function App() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="md:hidden fixed inset-0 bg-black/60 z-30"
+                className="md:hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-30"
                 onClick={() => setMenuAbierto(false)}
               />
               {/* Drawer */}
@@ -179,7 +179,8 @@ function App() {
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-                className="md:hidden fixed top-0 left-0 bottom-0 w-72 bg-gray-900 text-white z-40 flex flex-col shadow-2xl"
+                style={{ backgroundColor: '#111827' }}
+                className="md:hidden fixed top-0 left-0 bottom-0 w-72 text-white z-40 flex flex-col shadow-2xl border-r border-gray-700"
               >
                 <SidebarHeader />
                 <nav className="flex-1 overflow-y-auto py-2">
