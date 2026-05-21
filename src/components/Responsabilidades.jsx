@@ -271,6 +271,7 @@ export default function Responsabilidades() {
   const [actorAbierto, setActorAbierto] = useState(null)
   const [notaAbierta,  setNotaAbierta]  = useState(false)
   const [hoveredCell,  setHoveredCell]  = useState(null)
+  const [filtroTipo,   setFiltroTipo]   = useState('Todos')
 
   return (
     <motion.div
@@ -314,7 +315,26 @@ export default function Responsabilidades() {
       {/* ── Matriz ── */}
       <section className="mb-12">
         <h2 className="text-xl font-semibold text-gray-700 mb-1">Matriz de responsabilidades</h2>
-        <p className="text-sm text-gray-500 mb-5">Hover sobre cada celda para ver la norma aplicable</p>
+        <p className="text-sm text-gray-500 mb-3">Hover sobre cada celda para ver la norma aplicable · filtra por tipo de responsabilidad</p>
+
+        {/* Pills filtro tipo */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {['Todos', 'Penal', 'Civil', 'Administrativa'].map((tipo) => {
+            const activo = filtroTipo === tipo
+            const pillStyle = activo
+              ? 'bg-amber-600 text-white border-amber-600'
+              : 'bg-white text-gray-600 border-gray-300 hover:border-amber-400 hover:text-amber-700'
+            return (
+              <button
+                key={tipo}
+                onClick={() => setFiltroTipo(tipo)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${pillStyle}`}
+              >
+                {tipo}
+              </button>
+            )
+          })}
+        </div>
 
         <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
           <table className="w-full text-sm border-collapse min-w-[580px]">
@@ -332,30 +352,40 @@ export default function Responsabilidades() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {TIPOS_FILA.map((tipo) => (
-                <tr key={tipo}>
-                  <td className="p-3 font-semibold text-gray-700 bg-gray-50 text-sm">{tipo}</td>
-                  {ACTORES_COL.map((actor) => {
-                    const nivel = MATRIZ[tipo][actor]
-                    const st    = NIVEL_STYLE[nivel]
-                    const key   = `${tipo}-${actor}`
-                    const isHovered = hoveredCell === key
-                    return (
-                      <td
-                        key={actor}
-                        className={`p-2 text-center transition-all cursor-default ${isHovered ? 'brightness-90' : ''} ${st.matrizBg}`}
-                        onMouseEnter={() => setHoveredCell(key)}
-                        onMouseLeave={() => setHoveredCell(null)}
-                      >
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${isHovered ? 'ring-2 ring-offset-1 ring-gray-400' : ''} ${st.badge}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.dot}`} />
-                          {nivel}
-                        </span>
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
+              {TIPOS_FILA.map((tipo) => {
+                const esFiltrada = filtroTipo !== 'Todos' && filtroTipo !== tipo
+                const esDestacada = filtroTipo === tipo
+                return (
+                  <tr
+                    key={tipo}
+                    className={`transition-all duration-200 ${esFiltrada ? 'opacity-30' : ''}`}
+                  >
+                    <td className={`p-3 font-semibold text-sm transition-all ${esDestacada ? 'bg-amber-100 text-amber-800' : 'bg-gray-50 text-gray-700'}`}>
+                      {esDestacada && <span className="mr-1.5">→</span>}
+                      {tipo}
+                    </td>
+                    {ACTORES_COL.map((actor) => {
+                      const nivel = MATRIZ[tipo][actor]
+                      const st    = NIVEL_STYLE[nivel]
+                      const key   = `${tipo}-${actor}`
+                      const isHovered = hoveredCell === key
+                      return (
+                        <td
+                          key={actor}
+                          className={`p-2 text-center transition-all cursor-default ${isHovered ? 'brightness-90' : ''} ${esDestacada ? 'ring-1 ring-inset ring-amber-300' : ''} ${st.matrizBg}`}
+                          onMouseEnter={() => setHoveredCell(key)}
+                          onMouseLeave={() => setHoveredCell(null)}
+                        >
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${isHovered ? 'ring-2 ring-offset-1 ring-gray-400' : ''} ${st.badge}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.dot}`} />
+                            {nivel}
+                          </span>
+                        </td>
+                      )
+                    })}
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
