@@ -24,5 +24,7 @@ body {
 p {
   margin: 0;
   text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
   line-height: 1.5;
 }
