@@ -101,3 +101,23 @@
 **¿Qué se aceptó?** La estructura completa: banner gray con dot-grid, stats row con 4 KPIs (8 fases / 6 sin corrección / 1 herramienta / 64 palabras en el prompt más extenso), acordeón de 8 entradas con header compacto (número, título, badge Sin corrección / Con ajuste) y body expandible (blockquote del prompt, qué se aceptó, corrección si hubo, reflexión con borde izquierdo gris).  
 **¿Qué se corrigió?** Ninguna corrección necesaria en esta fase.  
 **Reflexión:** El usuario solicitó sugerencias explícitas antes de ejecutar la fase. Esto permitió acordar el layout (acordeón) y la sección de stats antes de implementar, evitando iteraciones de diseño posteriores. La bitácora se beneficia de ser la última fase: tiene acceso a todos los prompts anteriores como datos completos.
+
+---
+
+## Reflexión final — Agente vs chatbot
+
+Durante el desarrollo de este informe se utilizó **Claude Code** en modalidad de **agente** (CLI integrado en el entorno de desarrollo), lo que es cualitativamente distinto al uso de un **chatbot convencional** como Claude.ai o ChatGPT en el navegador.
+
+**Como agente**, Claude Code tiene acceso directo al árbol de archivos del proyecto, puede leer y escribir código sin intervención manual, ejecuta comandos de terminal de forma autónoma (`npm run build`, `git commit`, `git push`) y mantiene memoria persistente entre sesiones. Esta memoria acumulada es lo que permitió que los prompts de las últimas fases fueran significativamente más cortos que los de las primeras: el agente ya conocía el caso, los patrones de código y las convenciones del proyecto.
+
+**Como chatbot** (Claude.ai o ChatGPT en el navegador), la herramienta responde preguntas puntuales sin acceso al proyecto ni a los archivos, el usuario debe copiar y pegar las respuestas manualmente, y no hay memoria entre conversaciones. Es útil para resolver dudas conceptuales aisladas —qué dice un artículo de ley, cómo funciona un hook de React— pero ineficiente para tareas que involucran múltiples archivos coordinados.
+
+| Dimensión | Agente (Claude Code CLI) | Chatbot (navegador) |
+|-----------|--------------------------|---------------------|
+| Acceso al proyecto | Directo (lee y escribe archivos) | No tiene |
+| Ejecución de comandos | Autónoma | No aplica |
+| Memoria entre sesiones | Sí (archivos persistentes) | No |
+| Tipo de tarea ideal | Implementación multi-archivo | Consultas puntuales |
+| Uso en este informe | Fases 1–8 completas | No se utilizó |
+
+El uso del agente fue determinante para la coherencia del resultado: la consistencia visual entre las 8 secciones, la aplicación uniforme de patrones de código y la ausencia de errores de compilación en cada fase se explican por la capacidad del agente de leer el estado actual del proyecto antes de cada cambio, no solo por la calidad del prompt en aislamiento.

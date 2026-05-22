@@ -256,7 +256,7 @@ export default function Prompts() {
         </div>
       </div>
 
-      {/* ── Nota de cierre ─────────────────────────────────────── */}
+      {/* ── Reflexión final: agente vs chatbot ─────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -268,14 +268,74 @@ export default function Prompts() {
           className="px-6 py-3 text-white text-sm font-semibold"
           style={{ background: 'linear-gradient(90deg, #1f2937, #374151)' }}
         >
-          Síntesis — Sección 08
+          Reflexión final — Agente vs chatbot
         </div>
-        <div className="px-6 py-5 text-sm text-gray-700 leading-relaxed">
-          El uso de Claude Code durante las 8 fases del informe demostró que los mejores resultados
-          se obtienen cuando el prompt especifica el <strong>contexto exacto</strong> (nombres de leyes,
-          artículos, cifras del caso) y el <strong>formato deseado</strong> (interactividad, layout).
-          La memoria acumulada entre fases permitió que prompts cada vez más cortos produjeran
-          componentes cada vez más completos, validando el valor de un contexto de trabajo persistente.
+        <div className="px-6 py-5 space-y-5 text-sm text-gray-700">
+          <p className="leading-relaxed">
+            Durante el desarrollo de este informe se utilizó <strong>Claude Code</strong> en modalidad
+            de <strong>agente</strong> (CLI integrado en el entorno de desarrollo), lo que es
+            cualitativamente distinto al uso de un <strong>chatbot convencional</strong> como
+            Claude.ai o ChatGPT en el navegador.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-gray-900 text-gray-100 rounded-xl p-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Agente — Claude Code CLI</p>
+              <ul className="space-y-2 text-xs text-gray-300 leading-relaxed">
+                <li>• Acceso directo al proyecto: lee y escribe archivos sin intervención manual</li>
+                <li>• Ejecuta comandos de terminal autónomamente (build, commit, push)</li>
+                <li>• Mantiene memoria persistente entre sesiones</li>
+                <li className="text-green-400 font-medium">→ Ideal para implementación multi-archivo</li>
+              </ul>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Chatbot — Claude.ai / ChatGPT</p>
+              <ul className="space-y-2 text-xs text-gray-500 leading-relaxed">
+                <li>• Sin acceso al proyecto ni a los archivos</li>
+                <li>• El usuario copia y pega las respuestas manualmente</li>
+                <li>• Sin memoria entre conversaciones</li>
+                <li className="text-blue-500 font-medium">→ Útil para dudas conceptuales puntuales</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-gray-200">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2.5 text-left text-gray-600 font-semibold border-b border-gray-200">Dimensión</th>
+                  <th className="px-4 py-2.5 text-center text-gray-600 font-semibold border-b border-gray-200">Agente (Claude Code)</th>
+                  <th className="px-4 py-2.5 text-center text-gray-600 font-semibold border-b border-gray-200">Chatbot (navegador)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['Acceso al proyecto', 'Directo (lee y escribe archivos)', 'No tiene'],
+                  ['Ejecución de comandos', 'Autónoma', 'No aplica'],
+                  ['Memoria entre sesiones', 'Sí (archivos persistentes)', 'No'],
+                  ['Tipo de tarea ideal', 'Implementación multi-archivo', 'Consultas puntuales'],
+                  ['Uso en este informe', 'Fases 1–8 completas', 'No se utilizó'],
+                ].map(([dim, agente, chat], i) => (
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}>
+                    <td className="px-4 py-2.5 font-medium text-gray-700 border-b border-gray-100">{dim}</td>
+                    <td className="px-4 py-2.5 text-center border-b border-gray-100">
+                      <span className="inline-block bg-green-50 text-green-800 border border-green-200 px-2 py-0.5 rounded">{agente}</span>
+                    </td>
+                    <td className="px-4 py-2.5 text-center border-b border-gray-100">
+                      <span className="inline-block bg-gray-50 text-gray-500 border border-gray-200 px-2 py-0.5 rounded">{chat}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="leading-relaxed text-gray-600">
+            El uso del agente fue determinante para la coherencia del resultado: la consistencia visual
+            entre las 8 secciones, la aplicación uniforme de patrones de código y la ausencia de errores
+            en cada fase se explican por la capacidad del agente de leer el estado actual del proyecto
+            antes de cada cambio, no solo por la calidad del prompt en aislamiento.
+          </p>
         </div>
       </motion.div>
     </motion.div>
