@@ -92,4 +92,12 @@
 
 ---
 
-*El prompt de la fase 8 se registrará al ejecutarla.*
+### Fase 8 — Bitácora de Uso de IA
+
+**Prompt utilizado:**
+> "ejecutas la fase 8, sugiere mejoras si lo concideras optimo y hazme preguntas."
+
+**Sección:** 08_prompts_muñjhe.md + componente Prompts.jsx  
+**¿Qué se aceptó?** La estructura completa: banner gray con dot-grid, stats row con 4 KPIs (8 fases / 6 sin corrección / 1 herramienta / 64 palabras en el prompt más extenso), acordeón de 8 entradas con header compacto (número, título, badge Sin corrección / Con ajuste) y body expandible (blockquote del prompt, qué se aceptó, corrección si hubo, reflexión con borde izquierdo gris).  
+**¿Qué se corrigió?** Ninguna corrección necesaria en esta fase.  
+**Reflexión:** El usuario solicitó sugerencias explícitas antes de ejecutar la fase. Esto permitió acordar el layout (acordeón) y la sección de stats antes de implementar, evitando iteraciones de diseño posteriores. La bitácora se beneficia de ser la última fase: tiene acceso a todos los prompts anteriores como datos completos.

@@ -7,6 +7,7 @@ import Comparacion from './components/Comparacion'
 import Responsabilidades from './components/Responsabilidades'
 import Datos from './components/Datos'
 import Conclusiones from './components/Conclusiones'
+import Prompts from './components/Prompts'
 
 /* Strings completos — Tailwind 4 no detecta clases dinámicas */
 const COLOR_MAP = {
@@ -28,7 +29,7 @@ const secciones = [
   { id: 'responsabilidades',label: '05 · Responsabilidades',    componente: Responsabilidades, completada: true,  color: 'amber'   },
   { id: 'datos',            label: '06 · Datos personales',     componente: Datos,       completada: true,  color: 'purple'  },
   { id: 'conclusiones',     label: '07 · Conclusiones',         componente: Conclusiones, completada: true,  color: 'teal'    },
-  { id: 'prompts',          label: '08 · Bitácora IA',          componente: null,        completada: false, color: 'gray'    },
+  { id: 'prompts',          label: '08 · Bitácora IA',          componente: Prompts,     completada: true,  color: 'gray'    },
 ]
 
 const completadas = secciones.filter((s) => s.completada).length
